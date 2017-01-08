@@ -1,4 +1,8 @@
-﻿{
+{
+  "title": "StingyJunk.Util",
+  "copyright": "Andrew Stanton",
+  "description": "A set of utility classes and functions",
+  "language": "en-US",
   "version": "1.0.0-*",
 
   "dependencies": {

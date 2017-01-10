@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AnalyzerDescription" xml:space="preserve">
-    <value>Referenced assembly is forbidden</value>
+    <value>The referenced assembly is specified as forbidden in the ForbiddenReferences.xml file included in this project.</value>
     <comment>The assembly reference has been explicitly blocked</comment>
   </data>
   <data name="AnalyzerMessageFormat" xml:space="preserve">
@@ -126,7 +126,7 @@
     <comment>The format-able message the diagnostic displays.</comment>
   </data>
   <data name="AnalyzerTitle" xml:space="preserve">
-    <value>Referenced assembly is forbidden</value>
+    <value>Referenced assembly is forbidden.</value>
     <comment>The title of the diagnostic.</comment>
   </data>
 </root>

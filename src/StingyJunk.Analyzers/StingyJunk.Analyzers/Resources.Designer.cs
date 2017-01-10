@@ -62,7 +62,7 @@ namespace StingyJunk.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Referenced assembly is forbidden.
+        ///   Looks up a localized string similar to The referenced assembly is specified as forbidden in the ForbiddenReferences.xml file included in this project..
         /// </summary>
         internal static string AnalyzerDescription {
             get {
@@ -80,7 +80,7 @@ namespace StingyJunk.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Referenced assembly is forbidden.
+        ///   Looks up a localized string similar to Referenced assembly is forbidden..
         /// </summary>
         internal static string AnalyzerTitle {
             get {

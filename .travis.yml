@@ -1,2 +1,2 @@
 language: csharp
-solution: StingyJunk.sln
+solution: src\StingyJunk.sln

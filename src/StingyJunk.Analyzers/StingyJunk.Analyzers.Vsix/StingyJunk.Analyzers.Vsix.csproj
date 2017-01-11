@@ -47,13 +47,14 @@
     <StartArguments>/rootsuffix Roslyn</StartArguments>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StingyJunk.Analyzers\StingyJunk.Analyzers.csproj">
-      <Project>{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}</Project>
+      <Project>{9fd92ff8-300a-4c01-8d68-ce3d692a0fb3}</Project>
       <Name>StingyJunk.Analyzers</Name>
     </ProjectReference>
   </ItemGroup>

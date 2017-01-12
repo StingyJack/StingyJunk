@@ -20,12 +20,8 @@ namespace StingyJunk.Analyzers
     ///  </summary>
     /// <remarks>
     ///     There is no codefix associated with this. 
-    /// 
-    ///     It works but...
-    ///     - The nuget package adds the analyzer as a reference, not as an analyzer
-    ///     - The template ForbiddenReferences.xml is not included
     /// </remarks>
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    [DiagnosticAnalyzer(LanguageNames.CSharp, LanguageNames.VisualBasic)]
     public class ForbiddenReferenceAnalyzer : DiagnosticAnalyzer
     {
         #region "consts and fields"

@@ -1,2 +1,3 @@
+before_install: cd src
 language: csharp
-solution: src\StingyJunk.sln
+solution: StingyJunk.sln

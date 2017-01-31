@@ -1,4 +1,25 @@
-MIT License
+This software is available under two license models - "Qualifying" (the MIT with two extra bits)"
+or Non Qualifying (NonQual). 
+
+You have a choice between the two... 
+
+If you are using this to further Novo Nordisk (doubled the cost of Novolin insulin 
+- required to maintain compatiblity with life), you have chosen the NonQual. Likewise 
+if furthuring Mylan, mostly due to the quintupling the cost of epi-pen. 
+
+If using this code (in source or object or derivative, etc) is contributing to or 
+enabling predatory capitalism (unreasonable profit/extortion, or increasing the cost of life-
+necessary products without other reasonable cause) like the aforementioned Novo and Mylan, you choose
+the NonQual.
+
+All others get to choose the MIT+
+
+The choice is always available, and always yours.
+
+This part of the license is subject to change.
+
+----------------
+Qualifying - (Copied from MIT)
 
 Copyright (c) 2017 Andrew Stanton
 
@@ -9,8 +30,17 @@ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
+- The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
+
+- This or a derivative (in source or object form) can never be listed as owned 
+or authored by a company, corporation, or other like non-human entity. People 
+write code, they are the authors. 
+
+- This is not to be used in a way that would invoke the NonQual portion of the license
+
+- If this helped make something easier, I ask that you pay it forward 
+for someone else. 
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -19,3 +49,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+
+
+
+----------
+
+Non-Qualifying
+
+
+Fuck off. You cannot use, copy, modify, or even look at this code.

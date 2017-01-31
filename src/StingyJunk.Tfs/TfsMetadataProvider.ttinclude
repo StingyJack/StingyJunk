@@ -1,0 +1,17 @@
+﻿
+<#@ assembly name="$(TargetDir)\System.ComponentModel.TypeConverter.dll" #>
+
+<#@ import namespace="StingyJunk.Tfs"#>
+<#+
+
+    public class TfsMetadataProvider : MetadataProvider
+    {
+        public TfsMetadataProvider() : base()
+        {
+            
+        }
+
+    }
+
+
+#>

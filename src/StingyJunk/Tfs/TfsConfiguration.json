@@ -1,0 +1,10 @@
+﻿{
+  "Instances": [
+    {
+      "InstanceName": "Default",
+      "InstanceUrl": "http://localhost:8080/tfs/",
+      "AutoLoadInstanceMetaData": true
+    }
+  ],
+  "MaxRecordsInResultSets": 10
+}

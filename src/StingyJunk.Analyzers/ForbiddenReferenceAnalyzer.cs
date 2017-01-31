@@ -1,17 +1,16 @@
 namespace StingyJunk.Analyzers
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.IO;
     using System.Linq;
+    using System.Runtime.Serialization;
     using System.Text;
-    using System.Text.RegularExpressions;
     using System.Threading;
-    using System.Xml.Linq;
+    using Config;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
-    
+
     //TODO: Test with multiple projects  (stingybot)
     //TODO: Package, distribute, reference
 
@@ -57,30 +56,30 @@ namespace StingyJunk.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
-            
+
             context.RegisterCompilationAction(
                 compilationContext =>
                 {
                     var referencedAssemblies = compilationContext.Compilation.ReferencedAssemblyNames;
                     var options = compilationContext.Options;
                     var cancellationToken = compilationContext.CancellationToken;
-                    var forbiddenAssemblyRegexes = GetForbiddenReferenceRegexValues(options, cancellationToken);
+                    var forbiddenReferences = GetForbiddenReferencesFromConfig(options, cancellationToken);
 
-                    if (forbiddenAssemblyRegexes == null
-                        || forbiddenAssemblyRegexes.Any() == false)
+                    if (forbiddenReferences == null
+                        || forbiddenReferences.References.Any() == false)
                     {
                         return;
                     }
 
                     foreach (var refAssem in referencedAssemblies)
                     {
-                        foreach (var forbiddenAssemblyRegex in forbiddenAssemblyRegexes)
+                        foreach (var forbiddenReference in forbiddenReferences.References)
                         {
-                            if (Regex.IsMatch(refAssem.Name, forbiddenAssemblyRegex))
+                            if (forbiddenReference.IsForbidden(refAssem))
                             {
                                 var descr = string.Format(_MessageFormat.ToString(), refAssem.Name);
-                                compilationContext.ReportDiagnostic(Diagnostic.Create(DIAGNOSTIC_ID, CATEGORY, descr, DiagnosticSeverity.Error, 
-                                    DiagnosticSeverity.Error, true,0,_Title,_Description));
+                                compilationContext.ReportDiagnostic(Diagnostic.Create(DIAGNOSTIC_ID, CATEGORY, descr, DiagnosticSeverity.Error,
+                                    DiagnosticSeverity.Error, true, 0, _Title, _Description));
 
                             }
                         }
@@ -92,9 +91,9 @@ namespace StingyJunk.Analyzers
 
         #region "config"
 
-        private static IList<string> GetForbiddenReferenceRegexValues(AnalyzerOptions options, CancellationToken cancellationToken)
+        private static ForbiddenReferences GetForbiddenReferencesFromConfig(AnalyzerOptions options, CancellationToken cancellationToken)
         {
-            var returnValue = new List<string>();
+            var returnValue = new ForbiddenReferences();
 
             if (options == null || options.AdditionalFiles.Length == 0)
             {
@@ -111,7 +110,7 @@ namespace StingyJunk.Analyzers
             {
                 return returnValue;
             }
-            
+
             try
             {
                 var sourceText = configFile.GetText(cancellationToken);
@@ -120,13 +119,12 @@ namespace StingyJunk.Analyzers
                 {
                     sourceText.Write(writer, cancellationToken);
                 }
-
                 stream.Position = 0;
 
-                var doc = XDocument.Load(stream);
-                if (doc.Root == null) { return returnValue; }
-                var elements = doc.Root.Descendants("ForbiddenReference").Select(x => x.Value);
-                returnValue.AddRange(elements);
+                var dcs = new DataContractSerializer(typeof(ForbiddenReferences));
+                var verboten = dcs.ReadObject(stream);
+                var obj = verboten as ForbiddenReferences;
+                return obj;
             }
             catch (Exception)
             {

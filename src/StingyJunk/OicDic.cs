@@ -1,4 +1,4 @@
-﻿namespace StingyJunk.Util
+﻿namespace StingyJunk
 {
     using System;
     using System.Collections.Generic;
@@ -9,6 +9,9 @@
     /// <typeparam name="T"></typeparam>
     public class DicOic<T> : Dictionary<string, T>
     {
+        /// <summary>
+        ///     Creates a new instance 
+        /// </summary>
         public DicOic() : base(StringComparer.OrdinalIgnoreCase)
         {
         }

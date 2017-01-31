@@ -1,4 +1,4 @@
-﻿namespace StingyJunk.Util
+﻿namespace StingyJunk
 {
     using System;
 

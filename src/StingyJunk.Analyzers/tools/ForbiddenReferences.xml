@@ -1,15 +1,61 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!--This is an example of how to denote forbidden references-->
 <ForbiddenReferences>
-  
-  <ForbiddenReference>
+
+  <AssemblyRef>
     <!--This will exclude assemblies with the string "Something.SomeAssembly" anywhere in the name-->
     <NameMatch>(\w*)Something.SomeAssembly(\w*)</NameMatch>
-  </ForbiddenReference>
-  
+  </AssemblyRef>
+
   <!--This will exclude assemblies starting with the name "Something.SomeAssembly" that have versions higher then 1.6.5-->
-  <ForbiddenReference>
+  <AssemblyRef>
     <NameMatch>Something.SomeAssembly(\w*)</NameMatch>
     <VersionGreaterThan>1.6.5</VersionGreaterThan>
-  </ForbiddenReference>
+    <ReportAs>Warn</ReportAs>
+  </AssemblyRef>
+
+  <!--This namespace cannot reference the forbidden target-->
+  <NamespaceRef>
+    <NamespaceIdent />
+    <NameMatch></NameMatch>
+    <ForbidTargets>
+      <ForbidTarget>
+        <NamespaceMatch></NamespaceMatch>
+        <TypeMatch></TypeMatch>
+        <MemberMatch></MemberMatch>
+        <ReportAs>Error</ReportAs>
+      </ForbidTarget>
+      <ForbidTarget>
+        <NamespaceMatch></NamespaceMatch>
+        <TypeMatch></TypeMatch>
+        <MemberMatch></MemberMatch>
+        <ReportAs>Warn</ReportAs>
+      </ForbidTarget>
+    </ForbidTargets>
+  </NamespaceRef>
+  etc
+  <TypeRef>
+    <TypeIdent />
+    <NameMatch></NameMatch>
+    <ForbidTargets>
+      <ForbidTarget>
+        <NamespaceMatch></NamespaceMatch>
+        <TypeMatch></TypeMatch>
+        <MemberMatch></MemberMatch>
+        <ReportAs>Err</ReportAs>
+      </ForbidTarget>
+    </ForbidTargets>
+  </TypeRef>
+  <MemberRef>
+    <MemberIdent />
+    <NameMatch></NameMatch>
+    <ForbidTargets>
+      <ForbidTarget>
+        <NamespaceMatch></NamespaceMatch>
+        <TypeMatch></TypeMatch>
+        <MemberMatch></MemberMatch>
+      </ForbidTarget>
+    </ForbidTargets>
+
+  </MemberRef>
 </ForbiddenReferences>

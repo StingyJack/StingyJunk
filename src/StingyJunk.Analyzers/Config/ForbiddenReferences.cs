@@ -7,6 +7,6 @@
     public class ForbiddenReferences
     {
         [DataMember]
-        public List<ForbiddenReference> References { get; set; }
+        public List<AssemblyRef> References { get; set; }
     }
 }

@@ -6,7 +6,7 @@
     using Microsoft.CodeAnalysis;
 
     [DataContract]
-    public class ForbiddenReference
+    public class AssemblyRef
     {
         [DataMember]
         public string NameMatch { get; set; }

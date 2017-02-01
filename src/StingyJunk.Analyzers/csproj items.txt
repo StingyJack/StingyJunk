@@ -1,4 +1,6 @@
-﻿  <Target Name="AfterBuild">
+﻿These were in the original csproj. 
+
+  <Target Name="AfterBuild">
     <GetAssemblyIdentity AssemblyFiles="$(OutDir)\$(AssemblyName).dll">
       <Output TaskParameter="Assemblies" ItemName="AnalyzerAssemblyInfo" />
     </GetAssemblyIdentity>

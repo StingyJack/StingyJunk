@@ -292,6 +292,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\Bools.cs" />
     <Compile Include="LoggableBase.cs" />
     <Compile Include="NotAvailableYetAttribute.cs" />
     <Compile Include="OicDic.cs" />

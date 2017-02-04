@@ -1,0 +1,19 @@
+﻿{
+  "AssemblyRefs": [
+    {
+      "NameMatch": "(\\w*)Something.SomeAssembly(\\w*)"
+    },
+    {
+      "NameMatch": "",
+      "VersionGreaterThan": "",
+      "ReportAs"  : "Warn" 
+    }
+  ],
+  "NamespaceRefs": [
+  {
+    "NamespaceMatch": "",
+    ""
+  }],
+  "TypeRefs": [],
+  "MemberRef": [] 
+}

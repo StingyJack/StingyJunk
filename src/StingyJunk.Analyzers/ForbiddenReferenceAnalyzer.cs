@@ -18,7 +18,7 @@ namespace StingyJunk.Analyzers
     ///     Causes errors when a refernce is included that should not be added
     ///  </summary>
     /// <remarks>
-    ///     There is no codefix associated with this. 
+    ///     There is no codefix associated with this. Yet. 
     /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp, LanguageNames.VisualBasic)]
     public class ForbiddenReferenceAnalyzer : DiagnosticAnalyzer

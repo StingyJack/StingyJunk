@@ -14,7 +14,7 @@
     <ReportAs>Warn</ReportAs>
   </AssemblyRef>
 
-  <!--This namespace cannot reference the forbidden target-->
+  <!--The project cannot reference matching elements in this forbidden target-->
   <NamespaceRef>
     <NamespaceIdent />
     <NameMatch></NameMatch>
@@ -33,7 +33,7 @@
       </ForbidTarget>
     </ForbidTargets>
   </NamespaceRef>
-  etc
+  <!--etc-->
   <TypeRef>
     <TypeIdent />
     <NameMatch></NameMatch>

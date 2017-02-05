@@ -1,0 +1,9 @@
+<#@ template language="C#" #>
+using System.Reflection;
+using System.Runtime.InteropServices;
+
+
+[assembly: AssemblyCompany("Andrew Stanton")]
+[assembly: AssemblyProduct("StingyJunk")]
+[assembly: AssemblyCopyright("Copyright © Andrew Stanton <#=DateTime.Now.Year#>")]
+[assembly: AssemblyTrademark("Your Mom")]

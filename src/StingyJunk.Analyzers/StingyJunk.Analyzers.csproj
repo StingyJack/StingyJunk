@@ -56,7 +56,14 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>SharedAssemblyInfo.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SharedAssemblyInfo.tt</DependentUpon>
+    </Compile>
     <Compile Include="Config\ForbiddenReference.cs" />
+    <Compile Include="Config\ProjectComparisonTargetClasses.cs" />
     <Compile Include="ForbiddenReferenceAnalyzer.cs" />
     <Compile Include="Config\ForbiddenReferences.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -149,7 +156,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\SharedAssemblyInfo.tt">
+      <Link>SharedAssemblyInfo.tt</Link>
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SharedAssemblyInfo.cs</LastGenOutput>
+    </Content>
     <Content Include="csproj items.txt" />
+    <Content Include="tools\ProjectComparisonTarget.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\v4.6\Microsoft.Portable.CSharp.targets" />
   <PropertyGroup>

@@ -79,6 +79,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TfsMetadataProvider.ttinclude" />
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>SharedAssemblyInfo.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SharedAssemblyInfo.tt</DependentUpon>
+    </Compile>
     <Compile Include="AsmResolvableTtHost.cs" />
     <Compile Include="ProjectWantsAClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -89,6 +95,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\SharedAssemblyInfo.tt">
+      <Link>SharedAssemblyInfo.tt</Link>
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SharedAssemblyInfo.cs</LastGenOutput>
+    </Content>
     <Content Include="TfsWorkitemCodeGen.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>TfsWorkitemCodeGen.cs</LastGenOutput>

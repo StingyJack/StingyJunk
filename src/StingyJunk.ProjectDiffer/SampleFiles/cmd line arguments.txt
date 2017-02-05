@@ -1,0 +1,8 @@
+﻿#individual projects
+-b "Any CPU,x64"  -f "net452,net461" -i .\SampleFiles\SampleCsProj1.xml .\SampleFiles\SampleCsProj2.xml ".\SampleFiles\SampleCsProj 3.xml"
+
+#single solution
+-b "Any CPU,x64"  -f "net452,net461" -i .\SampleFiles\SampleSolution.sln 
+
+#mixed but should only load AnotherClassLibrary once
+-b "Any CPU,x64"  -f "net452,net461" -i .\SampleFiles\NonSolutionClassLibrary\NonSolutionClassLibrary.csproj .\SampleFiles\AnotherClassLibrary\AnotherClassLibrary.csproj  .\SampleFiles\SampleSolution.sln 

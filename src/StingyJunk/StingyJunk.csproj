@@ -330,7 +330,7 @@
     <Error Condition="!Exists('..\Packages\Scripty.MsBuild.0.5.0\build\Scripty.MsBuild.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\Packages\Scripty.MsBuild.0.5.0\build\Scripty.MsBuild.targets'))" />
   </Target>
   <PropertyGroup>
-    <PreBuildEvent>taskkill /f /fi "pid gt 0" /im T4VSHostProcess.exe</PreBuildEvent>
+    <PreBuildEvent>REM  taskkill /f /fi "pid gt 0" /im T4VSHostProcess.exe</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

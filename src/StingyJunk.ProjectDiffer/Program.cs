@@ -7,6 +7,8 @@ namespace StingyJunk.ProjectDiffer
     using System.Linq;
     using CommandLine;
     using FileHandling;
+    using Microsoft.Build.Evaluation;
+    using Microsoft.CodeAnalysis;
 
     internal class Program
     {
@@ -74,8 +76,9 @@ namespace StingyJunk.ProjectDiffer
             var fileCollection = FileUtils.GetFiles(fileInfos);
 
             var solutions = fileCollection.All<SolutionFile>();
-            var solutionProjects = fileCollection.All<ProjectFile>().Where(p => p.IsPartOfASolution).ToImmutableList();
-            var looseProjects = fileCollection.All<ProjectFile>().Where(p => p.IsPartOfASolution == false).ToImmutableList();
+            var projectsOnly = fileCollection.All<ProjectFile>();
+            var solutionProjects = projectsOnly.Where(p => p.IsPartOfASolution).ToImmutableList();
+            var looseProjects = projectsOnly.Where(p => p.IsPartOfASolution == false).ToImmutableList();
             var unknownFiles = fileCollection.All<CandidateFile>();
 
             if (unknownFiles.IsEmpty == false)
@@ -84,7 +87,51 @@ namespace StingyJunk.ProjectDiffer
             }
 
             Owl($"Found {solutions.Count} solutions with {solutionProjects.Count} total projects, and {looseProjects.Count} loose projects");
+            if (fileInfos.Count != projectsOnly.Count)
+            {
+                //mismatch ask to continue or not
+            }
+            var collection = new ProjectCollection();
+            //collection.DefaultToolsVersion = "4.0";
+            //var project = new Project(collection);
+            foreach (var project in projectsOnly)
+            {
 
+                //interrogate project
+                var pj = collection.LoadProject(project.FilePath);
+                //get configurations
+                //get target frameworks
+                var props = pj.Properties.Where(p => (p.Name.IndexOf("config", StringComparison.OrdinalIgnoreCase) >= 0) || (p.Name.IndexOf("target", StringComparison.OrdinalIgnoreCase) >= 0));
+                var projectDefaultTargetFramework = pj.Properties.FirstOrDefault(p => p.Name == "TargetFrameworkVersion");
+
+                Owl(string.Join(",", props.Select(p => $"prop: {p.Name}")));
+                foreach (var pc in pj.Xml.PropertyGroups)
+                {
+                    Owl($"{pc.Condition}");
+                }
+
+                //"v4.6.1"
+                var shortName = GetTargetFrameworkShortname(projectDefaultTargetFramework?.EvaluatedValue);
+                foreach (var wantedTarget in args.CompareTargetFrameworks)
+                {
+                    if (string.Equals(shortName, wantedTarget, StringComparison.OrdinalIgnoreCase))
+                    {
+                        //at least one
+                    }
+                }
+
+
+
+
+                //apply changes (does this need a filewatcher to prevent unintended corruption?
+
+            }
+
+        }
+
+        private static string GetTargetFrameworkShortname(string evaluatedValue)
+        {
+            
         }
     }
 }

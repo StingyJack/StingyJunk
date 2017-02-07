@@ -1,14 +1,16 @@
 ﻿<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>$id$</id>
+    <id>StingyJunk.Analyzers</id>
     <version>$version$</version>
     <title>StingyJunk.Analyzers</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
-    <releaseNotes>Checks for stuff that is "just not right" (present company excluded, ofc)</releaseNotes>
+    <authors>Andrew Stanton</authors>
+    <owners>Andrew Stanton</owners>
+    <licenseUrl>https://github.com/StingyJack/StingyJunk/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/StingyJack/StingyJunk</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>Checks for stuff that is "just not right" (present company excluded, ofc)</description>
+    <releaseNotes>Release Notes, Woo</releaseNotes>
     <copyright>$copyright$</copyright>
     <tags>StingyJunk.Analyzers, analyzers, forbidden, reference</tags>
     <frameworkAssemblies>

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9197CC9F-A225-4F17-977D-626788924A43}"
 	ProjectSection(SolutionItems) = preProject
@@ -12,17 +12,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\Readme.md = ..\Readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StingyJunk.Analyzers", "StingyJunk.Analyzers\StingyJunk.Analyzers.csproj", "{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeAnalysis", "CodeAnalysis", "{E5583D20-43DA-4E54-87F7-285D96B0D65C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StingyJunk.Analyzers.Test", "StingyJunk.Analyzers.Test\StingyJunk.Analyzers.Test.csproj", "{93CA7365-E9A4-4422-B360-8B6245925EC4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StingyJunk.Analyzers.Vsix", "StingyJunk.Analyzers.Vsix\StingyJunk.Analyzers.Vsix.csproj", "{B9BEBE88-BE39-4FA1-8204-3E12FE048840}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeAnalysis", "CodeAnalysis", "{E5583D20-43DA-4E54-87F7-285D96B0D65C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StingyJunk", "StingyJunk\StingyJunk.csproj", "{6DE9C742-0154-48B1-90E0-DE72A6121538}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StingyJunk.Tfs", "StingyJunk.Tfs\StingyJunk.Tfs.csproj", "{F7E2A944-0371-45B3-BF80-6D1B2B1FA025}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StingyJunk.Analyzers", "StingyJunk.Analyzers\StingyJunk.Analyzers.csproj", "{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StingyJunk.Vsix", "StingyJunk.Vsix\StingyJunk.Vsix.csproj", "{59040C96-D78B-4776-A42A-83EC97FC4F36}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StingyJunk.Compilation", "StingyJunk.Compilation\StingyJunk.Compilation.csproj", "{76394E8A-3192-4E68-9B9D-BA585ECC19C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSIXProject1", "VSIXProject1\VSIXProject1.csproj", "{549F9A8B-7A82-42F4-907E-5AB5445625F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,12 +37,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}.RegenCodeFiles|Any CPU.ActiveCfg = RegenCodeFiles|Any CPU
-		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}.RegenCodeFiles|Any CPU.Build.0 = RegenCodeFiles|Any CPU
-		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{93CA7365-E9A4-4422-B360-8B6245925EC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{93CA7365-E9A4-4422-B360-8B6245925EC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93CA7365-E9A4-4422-B360-8B6245925EC4}.RegenCodeFiles|Any CPU.ActiveCfg = RegenCodeFiles|Any CPU
@@ -58,13 +58,39 @@ Global
 		{F7E2A944-0371-45B3-BF80-6D1B2B1FA025}.RegenCodeFiles|Any CPU.Build.0 = RegenCodeFiles|Any CPU
 		{F7E2A944-0371-45B3-BF80-6D1B2B1FA025}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7E2A944-0371-45B3-BF80-6D1B2B1FA025}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}.RegenCodeFiles|Any CPU.ActiveCfg = RegenCodeFiles|Any CPU
+		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}.RegenCodeFiles|Any CPU.Build.0 = RegenCodeFiles|Any CPU
+		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59040C96-D78B-4776-A42A-83EC97FC4F36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59040C96-D78B-4776-A42A-83EC97FC4F36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59040C96-D78B-4776-A42A-83EC97FC4F36}.RegenCodeFiles|Any CPU.ActiveCfg = Release|Any CPU
+		{59040C96-D78B-4776-A42A-83EC97FC4F36}.RegenCodeFiles|Any CPU.Build.0 = Release|Any CPU
+		{59040C96-D78B-4776-A42A-83EC97FC4F36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59040C96-D78B-4776-A42A-83EC97FC4F36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.RegenCodeFiles|Any CPU.ActiveCfg = Release|Any CPU
+		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.RegenCodeFiles|Any CPU.Build.0 = Release|Any CPU
+		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{549F9A8B-7A82-42F4-907E-5AB5445625F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{549F9A8B-7A82-42F4-907E-5AB5445625F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{549F9A8B-7A82-42F4-907E-5AB5445625F4}.RegenCodeFiles|Any CPU.ActiveCfg = Release|Any CPU
+		{549F9A8B-7A82-42F4-907E-5AB5445625F4}.RegenCodeFiles|Any CPU.Build.0 = Release|Any CPU
+		{549F9A8B-7A82-42F4-907E-5AB5445625F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{549F9A8B-7A82-42F4-907E-5AB5445625F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3} = {E5583D20-43DA-4E54-87F7-285D96B0D65C}
 		{93CA7365-E9A4-4422-B360-8B6245925EC4} = {E5583D20-43DA-4E54-87F7-285D96B0D65C}
 		{B9BEBE88-BE39-4FA1-8204-3E12FE048840} = {E5583D20-43DA-4E54-87F7-285D96B0D65C}
+		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3} = {E5583D20-43DA-4E54-87F7-285D96B0D65C}
+		{59040C96-D78B-4776-A42A-83EC97FC4F36} = {E5583D20-43DA-4E54-87F7-285D96B0D65C}
+		{549F9A8B-7A82-42F4-907E-5AB5445625F4} = {E5583D20-43DA-4E54-87F7-285D96B0D65C}
 	EndGlobalSection
 EndGlobal

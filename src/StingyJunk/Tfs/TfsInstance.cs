@@ -39,7 +39,7 @@ namespace StingyJunk.Tfs
         /// <value>
         /// The instance URL.
         /// </value>
-        public string InstanceUrl { get; set; }
+        public string InstanceUrl { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether [automatic load instance meta data].
@@ -47,6 +47,6 @@ namespace StingyJunk.Tfs
         /// <value>
         /// <c>true</c> if [automatic load instance meta data]; otherwise, <c>false</c>.
         /// </value>
-        public bool AutoLoadInstanceMetaData { get; set; }
+        public bool AutoLoadInstanceMetaData { get; }
     }
 }

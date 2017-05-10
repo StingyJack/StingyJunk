@@ -87,8 +87,7 @@
         public static ClassDeclarationSyntax BuildClientBaseClassDecl(string newClientBaseName, string serviceContractName)
         {
             //svc util will generate these
-            var constructors = CSharpSyntaxTree.ParseText($" "
-                                                          + $"public {newClientBaseName} () {{}}"
+            var constructors = CSharpSyntaxTree.ParseText($"public {newClientBaseName} () {{}}"
                                                           + $"public {newClientBaseName} (string endpointConfigurationName) : base(endpointConfigurationName) {{}}"
                                                           +
                                                           $"public {newClientBaseName} (string endpointConfigurationName, string remoteAddress) :base(endpointConfigurationName, remoteAddress) {{}}"
@@ -244,10 +243,7 @@
             return newMethodIdentifier;
         }
 
-        public static PredefinedTypeSyntax ReturnVoid
-        {
-            get { return SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)); }
-        }
+        public static PredefinedTypeSyntax ReturnVoid => SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword));
 
         public static SyntaxToken BuildMethodIdentifier(string methodName)
         {

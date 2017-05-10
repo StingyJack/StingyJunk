@@ -1,4 +1,5 @@
-﻿namespace StingyJunk.Analyzers.Test.Helpers
+﻿// ReSharper disable All
+namespace StingyJunk.Analyzers.Test.Helpers
 {
     using System;
     using System.Collections.Generic;
@@ -15,10 +16,10 @@
     /// </summary>
     public abstract class DiagnosticVerifier
     {
-        private static readonly MetadataReference _CorlibReference = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
-        private static readonly MetadataReference _SystemCoreReference = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
-        private static readonly MetadataReference _CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
-        private static readonly MetadataReference _CodeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
+        private static readonly MetadataReference _corlibReference = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
+        private static readonly MetadataReference _systemCoreReference = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
+        private static readonly MetadataReference _cSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
+        private static readonly MetadataReference _codeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
 
         internal static string _DefaultFilePathPrefix = "Test";
         internal static string _CSharpDefaultFileExt = "cs";
@@ -67,9 +68,7 @@
                     }
                     else
                     {
-                        for (int i = 0; i < documents.Length; i++)
-                        {
-                            var document = documents[i];
+                        foreach (var document in documents) {
                             var tree = document.GetSyntaxTreeAsync().Result;
                             if (tree == diag.Location.SourceTree)
                             {
@@ -149,10 +148,10 @@
             var solution = new AdhocWorkspace()
                 .CurrentSolution
                 .AddProject(projectId, _TestProjectName, _TestProjectName, language)
-                .AddMetadataReference(projectId, _CorlibReference)
-                .AddMetadataReference(projectId, _SystemCoreReference)
-                .AddMetadataReference(projectId, _CSharpSymbolsReference)
-                .AddMetadataReference(projectId, _CodeAnalysisReference);
+                .AddMetadataReference(projectId, _corlibReference)
+                .AddMetadataReference(projectId, _systemCoreReference)
+                .AddMetadataReference(projectId, _cSharpSymbolsReference)
+                .AddMetadataReference(projectId, _codeAnalysisReference);
 
             int count = 0;
             foreach (var source in sources)

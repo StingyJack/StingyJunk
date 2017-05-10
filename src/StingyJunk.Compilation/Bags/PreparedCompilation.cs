@@ -1,9 +1,11 @@
 ﻿namespace StingyJunk.Compilation.Bags
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
 
+    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
     public class PreparedCompilation
     {
         public CSharpCompilationOptions Options { get; set; }

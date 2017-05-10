@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\LICENSE = ..\LICENSE
 		..\nuget.config = ..\nuget.config
 		..\Readme.md = ..\Readme.md
+		SharedAssemblyInfo.cs = SharedAssemblyInfo.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeAnalysis", "CodeAnalysis", "{E5583D20-43DA-4E54-87F7-285D96B0D65C}"
@@ -27,8 +28,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StingyJunk.Vsix", "StingyJunk.Vsix\StingyJunk.Vsix.csproj", "{59040C96-D78B-4776-A42A-83EC97FC4F36}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StingyJunk.Compilation", "StingyJunk.Compilation\StingyJunk.Compilation.csproj", "{76394E8A-3192-4E68-9B9D-BA585ECC19C0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSIXProject1", "VSIXProject1\VSIXProject1.csproj", "{549F9A8B-7A82-42F4-907E-5AB5445625F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -76,12 +75,6 @@ Global
 		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.RegenCodeFiles|Any CPU.Build.0 = Release|Any CPU
 		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{549F9A8B-7A82-42F4-907E-5AB5445625F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{549F9A8B-7A82-42F4-907E-5AB5445625F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{549F9A8B-7A82-42F4-907E-5AB5445625F4}.RegenCodeFiles|Any CPU.ActiveCfg = Release|Any CPU
-		{549F9A8B-7A82-42F4-907E-5AB5445625F4}.RegenCodeFiles|Any CPU.Build.0 = Release|Any CPU
-		{549F9A8B-7A82-42F4-907E-5AB5445625F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{549F9A8B-7A82-42F4-907E-5AB5445625F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,6 +84,5 @@ Global
 		{B9BEBE88-BE39-4FA1-8204-3E12FE048840} = {E5583D20-43DA-4E54-87F7-285D96B0D65C}
 		{9FD92FF8-300A-4C01-8D68-CE3D692A0FB3} = {E5583D20-43DA-4E54-87F7-285D96B0D65C}
 		{59040C96-D78B-4776-A42A-83EC97FC4F36} = {E5583D20-43DA-4E54-87F7-285D96B0D65C}
-		{549F9A8B-7A82-42F4-907E-5AB5445625F4} = {E5583D20-43DA-4E54-87F7-285D96B0D65C}
 	EndGlobalSection
 EndGlobal

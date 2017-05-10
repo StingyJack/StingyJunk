@@ -27,28 +27,25 @@ namespace StingyJunk.Analyzers
 
         public const string DIAGNOSTIC_ID = "SJ001";
 
-        private static readonly LocalizableString _Title = new LocalizableResourceString(nameof(Resources.AnalyzerTitle), Resources.ResourceManager,
+        private static readonly LocalizableString _title = new LocalizableResourceString(nameof(Resources.AnalyzerTitle), Resources.ResourceManager,
             typeof(Resources));
 
-        private static readonly LocalizableString _MessageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat),
+        private static readonly LocalizableString _messageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat),
             Resources.ResourceManager, typeof(Resources));
 
-        private static readonly LocalizableString _Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription),
+        private static readonly LocalizableString _description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription),
             Resources.ResourceManager, typeof(Resources));
 
         private const string CATEGORY = "References";
 
-        private static readonly DiagnosticDescriptor _Rule = new DiagnosticDescriptor(DIAGNOSTIC_ID, _Title, _MessageFormat, CATEGORY,
-            DiagnosticSeverity.Error, true, _Description);
+        private static readonly DiagnosticDescriptor _rule = new DiagnosticDescriptor(DIAGNOSTIC_ID, _title, _messageFormat, CATEGORY,
+            DiagnosticSeverity.Error, true, _description);
 
         #endregion //#region "consts and fields"
 
         #region "props and enums"
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
-        {
-            get { return ImmutableArray.Create(_Rule); }
-        }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(_rule);
 
         #endregion //#region "props and enums"
 
@@ -77,9 +74,9 @@ namespace StingyJunk.Analyzers
                         {
                             if (forbiddenReference.IsForbidden(refAssem))
                             {
-                                var descr = string.Format(_MessageFormat.ToString(), refAssem.Name);
+                                var descr = string.Format(_messageFormat.ToString(), refAssem.Name);
                                 compilationContext.ReportDiagnostic(Diagnostic.Create(DIAGNOSTIC_ID, CATEGORY, descr, DiagnosticSeverity.Error,
-                                    DiagnosticSeverity.Error, true, 0, _Title, _Description));
+                                    DiagnosticSeverity.Error, true, 0, _title, _description));
 
                             }
                         }

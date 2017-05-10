@@ -6,12 +6,11 @@ namespace StingyJunk.Tfs
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Configuration;
-    using Microsoft.TeamFoundation.Common;
     using Microsoft.TeamFoundation.Core.WebApi;
     using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
     using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
-    using Microsoft.VisualStudio.Services.Client;
     using Microsoft.VisualStudio.Services.Common;
+    using Microsoft.VisualStudio.Services.WebApi;
 
     /// <summary>
     ///     Provides base Tfs Connection and cached config info
@@ -55,13 +54,13 @@ namespace StingyJunk.Tfs
 
             if (onlySupportsOneTfsInstance.AutoLoadInstanceMetaData)
             {
-                LogInfo($"Auto loading Tfs instance metadata...");
+                LogInfo("Auto loading Tfs instance metadata...");
                 RebuildTfsKnownElementsAsync(baseUrl).GetAwaiter().GetResult();
-                LogInfo($"Auto load of Tfs instance metadata complete");
+                LogInfo("Auto load of Tfs instance metadata complete");
             }
             else
             {
-                LogInfo($"Auto load of Tfs instance metadata was skipped");
+                LogInfo("Auto load of Tfs instance metadata was skipped");
                 TfsKnownElements = new TfsKnownElements(baseUrl);
             }
         }

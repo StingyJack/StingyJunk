@@ -11,40 +11,40 @@
     [SuppressMessage("ReSharper", "VirtualMemberNeverOverridden.Global")]
     public abstract class LoggableBase
     {
-        private static ILog _Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         protected virtual void ReinitializeLogger(ILog nonDefaultLogImpelementation)
         {
-            if (_Log.Equals(nonDefaultLogImpelementation))
+            if (_log.Equals(nonDefaultLogImpelementation))
             {
                 return;
             }
-            _Log = nonDefaultLogImpelementation;
+            _log = nonDefaultLogImpelementation;
         }
 
         protected virtual void LogDebug(string message, Exception ex = null)
         {
-            _Log.Debug(message, ex);
+            _log.Debug(message, ex);
         }
 
         protected virtual void LogInfo(string message, Exception ex = null)
         {
-            _Log.Info(message, ex);
+            _log.Info(message, ex);
         }
 
         protected virtual void LogWarn(string message, Exception ex = null)
         {
-            _Log.Warn(message, ex);
+            _log.Warn(message, ex);
         }
 
         protected virtual void LogErr(string message, Exception ex = null)
         {
-            _Log.Error(message, ex);
+            _log.Error(message, ex);
         }
 
         protected virtual void LogFatal(string message, Exception ex = null)
         {
-            _Log.Fatal(message, ex);
+            _log.Fatal(message, ex);
         }
     }
 }

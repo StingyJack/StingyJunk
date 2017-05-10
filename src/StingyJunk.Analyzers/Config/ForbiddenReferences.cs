@@ -6,7 +6,14 @@
     [DataContract]
     public class ForbiddenReferences
     {
+        public ForbiddenReferences(List<ForbiddenReference> references = null)
+        {
+            References = references;
+        }
+
         [DataMember]
-        public List<ForbiddenReference> References { get; set; }
+        // ReSharper disable CollectionNeverUpdated.Global
+        public List<ForbiddenReference> References { get;  }
+        // ReSharper restore CollectionNeverUpdated.Global
     }
 }

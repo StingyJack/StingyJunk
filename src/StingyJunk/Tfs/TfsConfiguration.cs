@@ -7,7 +7,7 @@
         /// <summary>
         ///     Base instance urls
         /// </summary>
-        public List<TfsInstance> Instances { get; set; } = new List<TfsInstance>();
+        public List<TfsInstance> Instances { get; } = new List<TfsInstance>();
 
         public int MaxRecordsInResultSets { get; set; }
 

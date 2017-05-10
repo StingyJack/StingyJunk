@@ -119,15 +119,9 @@
 
         public static MethodDeclarationSyntax AsReturnTask(this MethodDeclarationSyntax methodDeclarationSyntax)
         {
-            TypeSyntax newMethodReturnType;
-            if (methodDeclarationSyntax.IsVoidReturnType())
-            {
-                newMethodReturnType = SyntaxFactory.ParseTypeName("Task");
-            }
-            else
-            {
-                newMethodReturnType = SyntaxFactory.GenericName("Task").AddTypeArgumentListArguments(methodDeclarationSyntax.ReturnType.WithoutTrivia());
-            }
+            var newMethodReturnType = methodDeclarationSyntax.IsVoidReturnType() 
+                ? SyntaxFactory.ParseTypeName("Task") 
+                : SyntaxFactory.GenericName("Task").AddTypeArgumentListArguments(methodDeclarationSyntax.ReturnType.WithoutTrivia());
             return methodDeclarationSyntax.WithReturnType(newMethodReturnType);
         }
 

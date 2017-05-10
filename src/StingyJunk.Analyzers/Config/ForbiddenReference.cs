@@ -1,29 +1,38 @@
 ﻿namespace StingyJunk.Analyzers.Config
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Runtime.Serialization;
     using System.Text.RegularExpressions;
     using Microsoft.CodeAnalysis;
 
     [DataContract]
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public class ForbiddenReference
     {
         [DataMember]
-        public string NameMatch { get; set; }
+        public string NameMatch { get; }
         [DataMember]
-        public string VersionGreaterThan { get; set; }
+        public string VersionGreaterThan { get; }
 
-        private Version _Version;
+        private Version _version;
+
+        public ForbiddenReference(string nameMatch, string versionGreaterThan)
+        {
+            NameMatch = nameMatch;
+            VersionGreaterThan = versionGreaterThan;
+        }
+
         private Version ParsedVersion
         {
             get
             {
-                if (_Version != null) { return _Version; }
-                if (Version.TryParse(VersionGreaterThan, out _Version) == false)
+                if (_version != null) { return _version; }
+                if (Version.TryParse(VersionGreaterThan, out _version) == false)
                 {
                     throw new ArgumentException($"cant parse version {VersionGreaterThan} for comparison");    
                 }
-                return _Version;
+                return _version;
             }
         }
 

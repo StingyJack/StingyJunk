@@ -91,17 +91,6 @@
         /// <param name="targetPath">The target path.</param>
         /// <param name="bytes">The bytes.</param>
         /// <returns></returns>
-        public static bool WriteFile(string targetPath, byte[] bytes)
-        {
-            return WriteFile(targetPath, bytes, false);
-        }
-
-        /// <summary>
-        ///     Writes the assembly.
-        /// </summary>
-        /// <param name="targetPath">The target path.</param>
-        /// <param name="bytes">The bytes.</param>
-        /// <returns></returns>
         public static bool WriteFileSoft(string targetPath, byte[] bytes)
         {
             return WriteFile(targetPath, bytes, true);
@@ -114,7 +103,7 @@
         /// <param name="bytes">The bytes.</param>
         /// <param name="soft">if set to <c>true</c> [soft].</param>
         /// <returns></returns>
-        public static bool WriteFile(string targetPath, byte[] bytes, bool soft)
+        public static bool WriteFile(string targetPath, byte[] bytes, bool soft = false)
         {
             try
             {

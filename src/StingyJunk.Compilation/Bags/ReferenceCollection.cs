@@ -60,11 +60,7 @@
                     continue;
                 }
                 var rawValue = filePathProp.GetValue(mr);
-                if (rawValue == null)
-                {
-                    continue;
-                }
-                var filePath = rawValue.ToString();
+                var filePath = rawValue?.ToString();
                 if (string.IsNullOrWhiteSpace(filePath))
                 {
                     continue;

@@ -1,4 +1,6 @@
-﻿namespace StingyJunk.Analyzers.Test.Helpers
+﻿// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable All
+namespace StingyJunk.Analyzers.Test.Helpers
 {
     using System;
     using Microsoft.CodeAnalysis;
@@ -12,12 +14,12 @@
         {
             if (line < -1)
             {
-                throw new ArgumentOutOfRangeException(nameof(line), @"line must be >= -1");
+                throw new ArgumentOutOfRangeException(nameof(line), "line must be >= -1");
             }
 
             if (column < -1)
             {
-                throw new ArgumentOutOfRangeException(nameof(column), @"line must be >= -1");
+                throw new ArgumentOutOfRangeException(nameof(column), "line must be >= -1");
             }
 
             Path = path;
@@ -35,22 +37,15 @@
     /// </summary>
     public struct DiagnosticResult
     {
-        private DiagnosticResultLocation[] _Locations;
+        private DiagnosticResultLocation[] _locations;
 
         public DiagnosticResultLocation[] Locations
         {
-            get
-            {
-                if (_Locations == null)
-                {
-                    _Locations = new DiagnosticResultLocation[] { };
-                }
-                return _Locations;
-            }
+            get { return _locations ?? (_locations = new DiagnosticResultLocation[] { }); }
 
             set
             {
-                _Locations = value;
+                _locations = value;
             }
         }
 

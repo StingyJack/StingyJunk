@@ -32,7 +32,7 @@
                 if (targetType == ResolutionTargetType.Cs)
                 {
                     var compilationUnit = GetRootMainCompilationUnit(FileUtilities.GetFileContent(path), CsRewriter.DefaultParseOptions);
-                    referencedCompilation = CompileAndWriteAssembly(path, ImmutableList.Create(compilationUnit.SyntaxTree),
+                    referencedCompilation = CompileAndWriteAssembly(ImmutableList.Create(compilationUnit.SyntaxTree),
                         asmDetail, namespaces, metadataReferences);
                 }
             }
@@ -41,13 +41,13 @@
                 if (targetType == ResolutionTargetType.Cs)
                 {
                     var extraction = CsRewriter.ExtractCompilationDetailFromClassFile(path);
-                    referencedCompilation = CompileAndWriteScript(path, extraction.CompilationTargets.First(),
+                    referencedCompilation = CompileAndWriteScript(extraction.CompilationTargets.First(),
                         asmDetail, namespaces, metadataReferences);
                 }
                 else
                 {
                     var compilationUnit = GetRootMainCompilationUnit(FileUtilities.GetFileContent(path));
-                    referencedCompilation = CompileAndWriteAssembly(path, ImmutableList.Create(compilationUnit.SyntaxTree),
+                    referencedCompilation = CompileAndWriteAssembly(ImmutableList.Create(compilationUnit.SyntaxTree),
                         asmDetail, namespaces, metadataReferences);
                 }
             }
@@ -58,8 +58,7 @@
             return referencedCompilation;
         }
 
-        public static ScriptCompilationResult CompileScript(string pathToScriptFile,
-            ImmutableList<SyntaxTree> compilationSources, AsmDetail detailsToUseForTarget,
+        public static ScriptCompilationResult CompileScript(ImmutableList<SyntaxTree> compilationSources, AsmDetail detailsToUseForTarget,
             IEnumerable<string> additionalUsings = null, IEnumerable<MetadataReference> additionalReferences = null)
         {
             var compilationPrep = PrepareCompilation(compilationSources, detailsToUseForTarget, additionalUsings, additionalReferences);
@@ -91,8 +90,7 @@
             return scriptCompilation;
         }
 
-        public static ScriptCompilationResult CompileAndWriteScript(string pathToScriptFile,
-            SyntaxTree compilationSource, AsmDetail detailsToUseForTarget,
+        public static ScriptCompilationResult CompileAndWriteScript(SyntaxTree compilationSource, AsmDetail detailsToUseForTarget,
             IEnumerable<string> additionalUsings = null, IEnumerable<MetadataReference> additionalReferences = null)
         {
             var compilationPrep = PrepareScriptCompilation(compilationSource, detailsToUseForTarget, additionalUsings, additionalReferences);
@@ -105,15 +103,13 @@
         /// <summary>
         ///     Compiles the and writes to a PE.
         /// </summary>
-        /// <param name="pathToScriptFile">The path to script file.</param>
         /// <param name="compilationSources">The compilation sources.</param>
         /// <param name="detailsToUseForTarget">The details to use for target.</param>
         /// <param name="additionalUsings">The additional usings.</param>
         /// <param name="additionalReferences">The additional references.</param>
         /// <param name="outputKind">Defaults to Dll if not specified</param>
         /// <returns></returns>
-        public static ScriptCompilationResult CompileAndWriteAssembly(string pathToScriptFile,
-            ImmutableList<SyntaxTree> compilationSources, AsmDetail detailsToUseForTarget,
+        public static ScriptCompilationResult CompileAndWriteAssembly(ImmutableList<SyntaxTree> compilationSources, AsmDetail detailsToUseForTarget,
             IEnumerable<string> additionalUsings = null, IEnumerable<MetadataReference> additionalReferences = null,
             OutputKind? outputKind = null)
         {
@@ -180,8 +176,7 @@ public static void Main()
         private static ScriptCompilationResult BuildScriptCompilationResult(AsmDetail detailsToUseForTarget, EmitResult emitResult,
             PreparedCompilation compilationPrep)
         {
-            var result = new ScriptCompilationResult();
-            result.CompilationResult = emitResult;
+            var result = new ScriptCompilationResult {CompilationResult = emitResult};
 
             if (emitResult.Diagnostics.Count(d => d.Severity == DiagnosticSeverity.Error) == 0)
             {
@@ -324,10 +319,6 @@ public static void Main()
             }
 
             var mainCompilationUnit = mainSyntaxTreeRoot as CompilationUnitSyntax;
-            if (mainCompilationUnit == null)
-            {
-                return null;
-            }
             return mainCompilationUnit;
         }
 

@@ -17,7 +17,7 @@
     ///     Provides the means for creating alternate forms of a c# class file for 
     /// use in scripting
     /// </summary>
-    public class CsRewriter
+    public static class CsRewriter
     {
         public const string DEFAULT_REWRITE_TEMP_EXTENSION = "rewrite.tmp";
         public const string DEFAULT_REWRITE_EXTENSION = "rewrite";
@@ -26,15 +26,9 @@
         public const string DEFAULT_PDB_EXTENSION = "pdb";
 
 
-        public static CSharpParseOptions DefaultScriptParseOptions
-        {
-            get { return CSharpParseOptions.Default.WithKind(SourceCodeKind.Script); }
-        }
+        public static CSharpParseOptions DefaultScriptParseOptions => CSharpParseOptions.Default.WithKind(SourceCodeKind.Script);
 
-        public static CSharpParseOptions DefaultParseOptions
-        {
-            get { return CSharpParseOptions.Default; }
-        }
+        public static CSharpParseOptions DefaultParseOptions => CSharpParseOptions.Default;
 
         /// <summary>
         ///     Creates a copy of the original file, without the things the <see cref="CSharpScript"/> resolver

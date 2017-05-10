@@ -14,7 +14,9 @@
         }
 
         public string ServiceContractName { get; }
+        // ReSharper disable UnusedAutoPropertyAccessor.Global
         public string ServiceContractFilePath { get; }
+        // ReSharper restore UnusedAutoPropertyAccessor.Global
         public string ServiceContractAsyncName => $"{ServiceContractName}Async";
 
         public string ClientContractAsyncName => $"{ServiceContractName}AsyncClient";

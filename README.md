@@ -1,11 +1,7 @@
-Build status: ![twavis](https://travis-ci.org/StingyJack/StingyJunk.svg?branch=master)
-
-## StingyJunk.Utils
-A collection of general purpose classes and functions
-
-### Attributes
-`NotAvailableYetAttribute` - when you need to mark something not ready for another developer to use.
+CI Build status: ![twavis](https://travis-ci.org/StingyJack/StingyJunk.svg?branch=master)  
+^ broken because travis or appveyor need to be coddled.
 
 
-### Collections
-`OicDic` - a `Dictionary<string,TValue>` that has an Ordinal Ignore Case comparer for the key.
+## StingyJunk
+A collection of assemblies and utilities for general purpose (collections, attributes), to code generation (roslyn, t4) and even some application stuff (tfs, slack, salesforce).
+

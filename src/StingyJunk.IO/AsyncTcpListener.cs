@@ -1,0 +1,257 @@
+﻿namespace StingyJunk.IO
+{
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Runtime.CompilerServices;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    /// <summary>
+    ///     A Task async pattern tcp socket listener  
+    /// </summary>
+    [SuppressMessage("ReSharper", "EventNeverSubscribedTo.Global")]
+    public class AsyncTcpListener
+    {
+        #region "fields, events, and props"
+
+        public const int SUCCESS = 0;
+        public const int ERROR = -1;
+
+        private TcpListener _tcpListener;
+
+        /// <summary>
+        ///     Subscribe to receive diagnostic messages
+        /// </summary>
+        public event EventHandler<DiagMessageEventArgs> DiagMessage;
+
+        /// <summary>
+        ///     Subscribe to handle replies
+        /// </summary>
+        public event EventHandler<MessageRequestResponseEventArgs> ResponseHandler;
+
+        /// <summary>
+        ///     Giff naem for logging/diagnostic
+        /// </summary>
+        public string Name { get; set; }
+
+        public int Port { get; set; }
+        public IPAddress IpAddress { get; set; }
+        public int Timeout { get; set; } = 1000;
+        private int _clientCounter;
+
+        #endregion //#region "fields, events, and props"
+
+        #region "ctor"
+
+        public AsyncTcpListener(string name, int port)
+        {
+            Name = name;
+            Port = port;
+            var hostName = Dns.GetHostName();
+            var ipHostInfo = Dns.GetHostEntry(hostName);
+
+            IpAddress = ipHostInfo.AddressList.FirstOrDefault(i => i.AddressFamily == AddressFamily.InterNetwork);
+
+            if (IpAddress == null)
+            {
+                throw new Exception("No IPv4 address for server");
+            }
+        }
+
+        #endregion //#region "ctor"
+
+        #region "control"
+
+        public async Task<int> RunAsync()
+        {
+            var cts = new CancellationTokenSource();
+            _tcpListener = new TcpListener(IpAddress, Port);
+            _tcpListener.Start();
+
+            Dm($"{nameof(AsyncTcpListener)} {Name} is now running on {IpAddress}:{Port}");
+
+
+            //just fire and forget. We break from the "forgotten" async loops
+            //in AcceptClientsAsync using a CancellationToken from `cts`
+
+            try
+            {
+                await AcceptClientsAsync(_tcpListener, cts.Token);
+            }
+            catch (Exception ex)
+            {
+                Dm(ex.Message);
+                throw;
+            }
+
+            return SUCCESS;
+        }
+
+        public void Stop()
+        {
+            _tcpListener?.Stop();
+        }
+
+        #endregion //#region "control"
+
+        #region "worker methods"
+
+        private async Task AcceptClientsAsync(TcpListener listener, CancellationToken ct)
+        {
+            _clientCounter = 0;
+            while (!ct.IsCancellationRequested)
+            {
+                var client = await listener.AcceptTcpClientAsync()
+                    .ConfigureAwait(false);
+                var clientId = Interlocked.Increment(ref _clientCounter);
+
+                //once again, just fire and forget, and use the CancellationToken
+                //to signal to the "forgotten" async invocation.
+                // ^ not sure why one is "forgotten"
+
+#pragma warning disable 4014
+                //ProcessAsync(client, clientId, ct).ConfigureAwait(false);
+                ProcessAsync2(client, clientId, ct).ConfigureAwait(false);
+                //Task.Run(async () => await ProcessAsync2(client, clientId, ct), ct);
+#pragma warning restore 4014
+            }
+        }
+
+        private async Task ProcessAsync(TcpClient tcpClient, int clientId,
+            CancellationToken ct)
+        {
+            var clientEndPoint = tcpClient.Client.RemoteEndPoint.ToString();
+            Dm($"ClientId {clientId} requested connection from {clientEndPoint}");
+
+            using (tcpClient)
+            {
+                var networkStream = tcpClient.GetStream();
+                var reader = new StreamReader(networkStream);
+                var writer = new StreamWriter(networkStream) { AutoFlush = true };
+                while (!ct.IsCancellationRequested)
+                {
+                    // if (stream.CanTimeout) {stream.ReadTimeout = Timeout;} probably also OK here.
+                    //  but the completedTask lets whichever comes due first "win".
+                    var timeoutTask = Task.Delay(TimeSpan.FromSeconds(Timeout), ct);
+                    //var amountReadTask = stream.ReadAsync(buf, 0, buf.Length, ct);
+                    var amountReadTask = reader.ReadLineAsync();
+
+                    var completedTask = await Task.WhenAny(timeoutTask, amountReadTask).ConfigureAwait(false);
+                    if (completedTask == timeoutTask)
+                    {
+                        Dm($"\t ClientId {clientId} timed out waiting for data");
+                        break;
+                    }
+                    //now we know that the amountTask is complete so
+                    //we can ask for its Result without blocking
+                    var dataFromClient = amountReadTask.Result;
+                    if (string.IsNullOrWhiteSpace(dataFromClient))
+                    {
+                        Dm($"\t ClientId {clientId} sent no value.");
+                        break;
+                    }
+
+                    Dm($"\t ClientId {clientId} received data from client: {dataFromClient}");
+                    var response = Respond(dataFromClient);
+                    Dm($"\t ClientId {clientId} responding with {response}");
+                    await writer.WriteLineAsync(response).ConfigureAwait(false);
+                    writer.Flush();
+                }
+            }
+            Dm($"\t ClientId {clientId} disconnected");
+        }
+
+        private async Task ProcessAsync2(TcpClient tcpClient, int clientId,
+            CancellationToken ct)
+        {
+            var clientEndPoint = tcpClient.Client.RemoteEndPoint.ToString();
+            Dm($"ClientId {clientId} requested connection from {clientEndPoint}");
+
+            var networkStream = tcpClient.GetStream();
+            if (networkStream.CanTimeout && networkStream.ReadTimeout > Timeout)
+            {
+                networkStream.ReadTimeout = Timeout;
+            }
+
+            var result = new StringBuilder();
+
+            var reader = new StreamReader(networkStream);
+            var writer = new StreamWriter(networkStream) {AutoFlush = true};
+            try
+            {
+                while (reader.Peek() >= 0)
+                {
+                    if (ct.IsCancellationRequested == true)
+                    {
+                        break;
+                    }
+                    var buffer = new char[1];
+                    await reader.ReadAsync(buffer, 0, 1);
+                    result.Append(buffer);
+                }
+
+                if (result.Length == 0)
+                {
+                    Dm($"\t ClientId {clientId} sent no value.");
+                    return;
+                }
+
+                var dataFromClient = result.ToString();
+                Dm($"\t ClientId {clientId} received data from client: {dataFromClient}");
+                var response = Respond(dataFromClient);
+
+                Dm($"\t ClientId {clientId} responding with {response}");
+                await writer.WriteLineAsync(response).ConfigureAwait(false);
+                writer.Flush();
+
+            }
+            catch (Exception e)
+            {
+                Dm($"\t ClientId {clientId} timed out waiting for data");
+
+                Dm(e.Message);
+                throw;
+            }
+            finally
+            {
+                reader.Dispose();
+                writer.Dispose();
+            }
+
+        Dm($"\t ClientId {clientId} disconnected");
+        }
+
+        private string Respond(string request)
+        {
+            var rea = new MessageRequestResponseEventArgs { RequestMessage = request };
+            OnResponseHandler(rea);
+            return rea.ResponseMessage;
+        }
+
+        #endregion //#region "worker methods"
+
+        #region  "events and utils"
+
+        protected virtual void OnDiagMessage(DiagMessageEventArgs e)
+        {
+            DiagMessage?.Invoke(this, e);
+        }
+
+        protected virtual void OnResponseHandler(MessageRequestResponseEventArgs e)
+        {
+            ResponseHandler?.Invoke(this, e);
+        }
+
+        private void Dm(string message, [CallerMemberName] string methodName = null)
+        {
+            OnDiagMessage(new DiagMessageEventArgs { DiagnosticMessage = message, Timestamp = DateTime.Now, SourceName = methodName });
+        }
+
+        #endregion //#region  "events and utils"
+    }
+}

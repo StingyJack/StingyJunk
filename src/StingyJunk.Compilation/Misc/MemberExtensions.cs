@@ -36,6 +36,11 @@
 
         public static BaseMethodDeclarationSyntax StripAccessModifiers(BaseMethodDeclarationSyntax methodDeclarationSyntax)
         {
+            if (methodDeclarationSyntax.Modifiers.Count == 0)
+            {
+                return methodDeclarationSyntax;
+            }
+
             var modifier = methodDeclarationSyntax.FirstAccModifier();
             while (modifier.HasValue)
             {

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>StingyJunk.IO</id>
+    <version>1.0.1</version>
+    <title>IO related helpers</title>
+    <authors>Andrew Stanton</authors>
+    <owners>Andrew Stanton</owners>
+    <projectUrl>https://github.com/StingyJack/StingyJunk</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>IO stuff</description>
+    <releaseNotes>There are no release notes</releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>IO Tcp File</tags>
+  </metadata>
+  <files>
+    <file src="bin\$configuration$\StingyJunk.IO.dll" target="lib\net462"/>
+    <file src="bin\$configuration$\StingyJunk.IO.pdb" target="lib\net462"/>
+    <file src="bin\$configuration$\Examples\*.*" target="content\Examples"/>
+  </files>
+</package>

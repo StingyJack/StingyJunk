@@ -33,6 +33,10 @@
 
         public static ClassDeclarationSyntax StripAccessModifiers(ClassDeclarationSyntax classDeclarationSyntax)
         {
+            if (classDeclarationSyntax.Modifiers.Count == 0)
+            {
+                return classDeclarationSyntax;
+            }
             var modifier = classDeclarationSyntax.FirstAccModifier();
             while (modifier.HasValue)
             {

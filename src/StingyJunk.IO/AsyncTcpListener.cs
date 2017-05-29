@@ -48,14 +48,30 @@
 
         #region "ctor"
 
-        public AsyncTcpListener(string name, int port)
+        /// <summary>
+        ///     Creates a new listener
+        /// </summary>
+        /// <param name="name">Friendly name to use for diagnostics, etc</param>
+        /// <param name="port">the TCP port</param>
+        /// <param name="requestedIpAddress">
+        ///     A specific IP to use. If not provided, the first InterNetwork 
+        ///     address that is returned from Dns.GetHostEntry is used.
+        /// </param>
+        public AsyncTcpListener(string name, int port, IPAddress requestedIpAddress = null)
         {
             Name = name;
             Port = port;
             var hostName = Dns.GetHostName();
             var ipHostInfo = Dns.GetHostEntry(hostName);
 
-            IpAddress = ipHostInfo.AddressList.FirstOrDefault(i => i.AddressFamily == AddressFamily.InterNetwork);
+            if (requestedIpAddress != null)
+            {
+                IpAddress = requestedIpAddress;
+            }
+            else
+            {
+                IpAddress = ipHostInfo.AddressList.FirstOrDefault(i => i.AddressFamily == AddressFamily.InterNetwork);
+            }
 
             if (IpAddress == null)
             {

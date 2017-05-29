@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>StingyJunk.IO</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <title>IO related helpers</title>
     <authors>Andrew Stanton</authors>
     <owners>Andrew Stanton</owners>

@@ -1,9 +1,12 @@
 ﻿namespace StingyJunk.IO.ExampleServer
 {
     using System;
+    using System.Net;
+    using System.Linq;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
     using ConsoleHelpers;
+    using System.Net.Sockets;
 
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     [SuppressMessage("ReSharper", "UnusedParameter.Local")]
@@ -14,7 +17,14 @@
 
         private static void Main(string[] args)
         {
-            var service = new AsyncTcpListener("Listener Simulator", 20000);
+            var hostName = Dns.GetHostName();
+            var ipHostInfo = Dns.GetHostEntry(hostName);
+            var ipAddress = ipHostInfo.AddressList.FirstOrDefault(i => i.AddressFamily == AddressFamily.InterNetwork);
+            var service = new AsyncTcpListener("Listener Simulator", 20000, ipAddress);
+            
+            //all that ^ or just use the default
+            //var service = new AsyncTcpListener("Listener Simulator", 20000);
+
             Task.Run(async () =>
             {
                 service.DiagMessage += Service_DiagMessage;

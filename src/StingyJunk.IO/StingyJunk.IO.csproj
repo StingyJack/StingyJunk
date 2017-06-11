@@ -51,6 +51,7 @@
     </Content>
     <Compile Include="AsyncTcpListener.cs" />
     <Compile Include="DiagMessageEventArgs.cs" />
+    <Compile Include="InfoMessageEventArgs.cs" />
     <Compile Include="MessageRequestResponseEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

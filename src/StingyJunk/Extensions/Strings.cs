@@ -1,5 +1,7 @@
 ﻿namespace StingyJunk.Extensions
 {
+    using System;
+    using System.Collections.Generic;
     using System.Text;
 
     public static class Strings
@@ -13,6 +15,16 @@
             }
             props.Length--;
             return props.ToString();
+        }
+
+        public static string ToNewLineList(this IEnumerable<string> list)
+        {
+            return string.Join(Environment.NewLine, list);
+        }
+
+        public static string ToCsl(this IEnumerable<string> list)
+        {
+            return string.Join(",", list);
         }
     }
 }

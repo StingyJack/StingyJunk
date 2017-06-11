@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3B410201-4A88-4035-A757-CE7E41521BF9}</ProjectGuid>
+    <ProjectGuid>{B2EA6CC7-021A-4344-8675-4249A3638C64}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>StingyJunk.IO.ExampleClient</RootNamespace>
-    <AssemblyName>StingyJunk.IO.ExampleClient</AssemblyName>
+    <RootNamespace>StingyJunk.Console.Example</RootNamespace>
+    <AssemblyName>StingyJunk.Console.Example</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>StingyJunk.Console.Example.MultiAreaExampleConsoleWindow</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -42,15 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SharedAssemblyInfo.cs">
-      <Link>SharedAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="DataExchangeResult.cs" />
-    <Compile Include="LogEntry.cs" />
-    <Compile Include="LogEntryList.cs" />
-    <Compile Include="ExampleClient.cs" />
+    <Compile Include="MultiAreaExampleConsoleWindow.cs" />
+    <Compile Include="SimpleExampleConsoleWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="OperationResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

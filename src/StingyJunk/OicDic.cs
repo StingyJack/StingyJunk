@@ -7,12 +7,12 @@
     ///     A case insensitive string keyed dictionary
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class DicOic<T> : Dictionary<string, T>
+    public class OicDic<T> : Dictionary<string, T>
     {
         /// <summary>
         ///     Creates a new instance 
         /// </summary>
-        public DicOic() : base(StringComparer.OrdinalIgnoreCase)
+        public OicDic() : base(StringComparer.OrdinalIgnoreCase)
         {
         }
     }

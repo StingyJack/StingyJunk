@@ -1,6 +1,7 @@
 ﻿namespace StingyJunk.IO
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
@@ -15,6 +16,7 @@
     ///     A Task async pattern tcp socket listener  
     /// </summary>
     [SuppressMessage("ReSharper", "EventNeverSubscribedTo.Global")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class AsyncTcpListener
     {
         #region "fields, events, and props"
@@ -29,6 +31,8 @@
         /// </summary>
         public event EventHandler<DiagMessageEventArgs> DiagMessage;
 
+        public event EventHandler<InfoMessageEventArgs> InfoMessage;
+
         /// <summary>
         ///     Subscribe to handle replies
         /// </summary>
@@ -40,7 +44,8 @@
         public string Name { get; set; }
 
         public int Port { get; set; }
-        public IPAddress IpAddress { get; set; }
+        
+        public IPAddress[] IpAddresses { get; set; }
         public int Timeout { get; set; } = 1000;
         private int _clientCounter;
 
@@ -66,16 +71,16 @@
 
             if (requestedIpAddress != null)
             {
-                IpAddress = requestedIpAddress;
+                IpAddresses = new [] {requestedIpAddress};
             }
             else
             {
-                IpAddress = ipHostInfo.AddressList.FirstOrDefault(i => i.AddressFamily == AddressFamily.InterNetwork);
+                IpAddresses = ipHostInfo.AddressList.Where(i => i.AddressFamily == AddressFamily.InterNetwork).ToArray();
             }
 
-            if (IpAddress == null)
+            if (IpAddresses == null || IpAddresses.Length == 0)
             {
-                throw new Exception("No IPv4 address for server");
+                throw new Exception("No IP address for server");
             }
         }
 
@@ -83,13 +88,26 @@
 
         #region "control"
 
-        public async Task<int> RunAsync()
+        public int Run()
         {
             var cts = new CancellationTokenSource();
-            _tcpListener = new TcpListener(IpAddress, Port);
+            var tasks = new List<Task>();
+            Parallel.ForEach(IpAddresses, i =>
+            {
+                tasks.Add(SpawnListenerAsync(cts, i, Port));
+            });
+
+            Task.WaitAll(tasks.ToArray());
+
+            return SUCCESS;
+        }
+
+        private async Task SpawnListenerAsync(CancellationTokenSource cts, IPAddress ipAddress, int port)
+        {
+            _tcpListener = new TcpListener(ipAddress, port);
             _tcpListener.Start();
 
-            Dm($"{nameof(AsyncTcpListener)} {Name} is now running on {IpAddress}:{Port}");
+            Im($"{nameof(AsyncTcpListener)} {Name} is now running on {ipAddress}:{port}");
 
 
             //just fire and forget. We break from the "forgotten" async loops
@@ -104,8 +122,6 @@
                 Dm(ex.Message);
                 throw;
             }
-
-            return SUCCESS;
         }
 
         public void Stop()
@@ -132,12 +148,15 @@
 
 #pragma warning disable 4014
                 //ProcessAsync(client, clientId, ct).ConfigureAwait(false);
-                ProcessAsync2(client, clientId, ct).ConfigureAwait(false);
+                ProcessAsync(client, clientId, ct).ConfigureAwait(false);
                 //Task.Run(async () => await ProcessAsync2(client, clientId, ct), ct);
 #pragma warning restore 4014
             }
         }
 
+        #region "former implementation"
+
+        /*
         private async Task ProcessAsync(TcpClient tcpClient, int clientId,
             CancellationToken ct)
         {
@@ -181,8 +200,11 @@
             }
             Dm($"\t ClientId {clientId} disconnected");
         }
+        */
 
-        private async Task ProcessAsync2(TcpClient tcpClient, int clientId,
+        #endregion //#region "former implementation"
+
+        private async Task ProcessAsync(TcpClient tcpClient, int clientId,
             CancellationToken ct)
         {
             var clientEndPoint = tcpClient.Client.RemoteEndPoint.ToString();
@@ -224,7 +246,6 @@
                 Dm($"\t ClientId {clientId} responding with {response}");
                 await writer.WriteLineAsync(response).ConfigureAwait(false);
                 writer.Flush();
-
             }
             catch (Exception e)
             {
@@ -239,12 +260,12 @@
                 writer.Dispose();
             }
 
-        Dm($"\t ClientId {clientId} disconnected");
+            Dm($"\t ClientId {clientId} disconnected");
         }
 
         private string Respond(string request)
         {
-            var rea = new MessageRequestResponseEventArgs { RequestMessage = request };
+            var rea = new MessageRequestResponseEventArgs {RequestMessage = request};
             OnResponseHandler(rea);
             return rea.ResponseMessage;
         }
@@ -258,14 +279,25 @@
             DiagMessage?.Invoke(this, e);
         }
 
+        protected virtual void OnInfoMessage(InfoMessageEventArgs e)
+        {
+            InfoMessage?.Invoke(this, e);
+        }
+
         protected virtual void OnResponseHandler(MessageRequestResponseEventArgs e)
         {
             ResponseHandler?.Invoke(this, e);
         }
 
+        private void Im(string message, [CallerMemberName] string methodName = null)
+        {
+            OnInfoMessage(new InfoMessageEventArgs {InfoMessage = message, Timestamp = DateTime.Now, SourceName = methodName});
+        }
+
+
         private void Dm(string message, [CallerMemberName] string methodName = null)
         {
-            OnDiagMessage(new DiagMessageEventArgs { DiagnosticMessage = message, Timestamp = DateTime.Now, SourceName = methodName });
+            OnDiagMessage(new DiagMessageEventArgs {DiagnosticMessage = message, Timestamp = DateTime.Now, SourceName = methodName});
         }
 
         #endregion //#region  "events and utils"

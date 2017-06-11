@@ -2,109 +2,142 @@
 {
     using System;
     using System.Collections.Concurrent;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Net.Sockets;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using ConsoleHelpers;
+    using Console;
 
     internal static partial class ExampleClient
     {
-        private static readonly ConsoleHelpers _ch = new ConsoleHelpers();
-        private static readonly ConcurrentBag<Result> _results = new ConcurrentBag<Result>();
+        private static ConsoleWindow _consoleWindow;
+        private static readonly ConcurrentBag<OperationResult> _results = new ConcurrentBag<OperationResult>();
         private const string TRIGGER_TEXT = "SENDING SOME DATA FROM";
+        private const string HEADER_AREA = "HeaderArea";
+        private const string LOG_AREA = "LogArea";
 
         private static void Main()
         {
+            Thread.CurrentThread.Name = nameof(ExampleClient);
             //  Pausing this so server can start first when debugging this and server at the same time.
-            Thread.Sleep(2* 1000); 
+            Thread.Sleep(2 * 1000);
+            var headerArea = new DisplayArea(HEADER_AREA, 0, 0, 7, Console.WindowWidth);
+            var logArea = new DisplayArea(LOG_AREA, headerArea.Bottom + 1, 0, Console.WindowHeight - (headerArea.Bottom + 1), Console.WindowWidth)
+            {
+                Cycle = true
+            };
 
+            _consoleWindow = new ConsoleWindow(new[] { headerArea, logArea });
+            
             // ~16k is where the amount of completed connections in TIME_WAIT 
             //  that are delaying completion and the number of open connections
             //  exceeds the allowed sockets per port on this win10 machine.
             // More can probably be done with either better connection management, shorter timeouts, or 
             //  some registry tweaking. 
-            const int RUN_COUNT = 1 * 5000;
+            const int RUN_COUNT = 1 * 100;
             const int MAXDOP = 5;
-            
-            _ch.Cwl("Starting client nag. Press ESC to stop nagging", ConsoleColor.Yellow);
-            var tasks = new List<Task>();
+
+            _consoleWindow.WriteLine("Starting client nag. Press ESC to stop nagging", Flair.Warning, HEADER_AREA);
+            //            var tasks = new List<Task>();
             var overallSw = Stopwatch.StartNew();
-            
-            Parallel.For(0, RUN_COUNT, new ParallelOptions { MaxDegreeOfParallelism = MAXDOP }, (i) =>
+
+            Parallel.For(0, RUN_COUNT, new ParallelOptions { MaxDegreeOfParallelism = MAXDOP }, async i =>
             {
-                var result = new Result { ClientId = i };
-                result.RequestMessage  = $"{TRIGGER_TEXT} Clientside ident {result.ClientId}. OK?";
-                var perItemSw = Stopwatch.StartNew();
-                var t = ExchangeData(result.RequestMessage, result.ClientId);
-                tasks.Add(t);
-                result.ResponseMessage = t.Result;
-                perItemSw.Stop();
-                result.ElapsedMs = perItemSw.ElapsedMilliseconds;
+                var result = await ExecuteDataExchange(i);
                 _results.Add(result);
             });
-            
+
             overallSw.Stop();
-            
-            Task.WaitAll(tasks.ToArray()); //let any further console updates post before adding summary
-            Console.SetCursorPosition(0,2);
-            _ch.Cwl($"Ran {RUN_COUNT} records in {overallSw.ElapsedMilliseconds}ms with MAXDOP of {MAXDOP}");
+
+            //          Task.WaitAll(tasks.ToArray()); //let any further console updates post before adding summary
+
+            _consoleWindow.WriteLine($"Ran {RUN_COUNT} records in {overallSw.ElapsedMilliseconds}ms with MAXDOP of {MAXDOP}", Flair.Success, HEADER_AREA);
+            var errors = _results.Where(r => r.Ex != null).ToArray();
+            if (errors.Any())
+            {
+                _consoleWindow.WriteLine($"There were {errors.Length} errors", Flair.Error, HEADER_AREA);
+                foreach (var err in errors)
+                {
+                    _consoleWindow.WriteLine($"\t client {err.ClientId}: {err.Ex}", Flair.Error, HEADER_AREA);
+                }
+            }
+
             var rate = overallSw.ElapsedMilliseconds / (decimal)RUN_COUNT;
-            _ch.Cwl($"Overall rate of {rate}ms per record");
-            
+            _consoleWindow.WriteLine($"Overall rate of {rate}ms per record", Flair.Success, HEADER_AREA);
+
             var sumResultTimes = _results.Sum(r => r.ElapsedMs);
-            _ch.Cwl($"Per item total time of {sumResultTimes}ms");
+            _consoleWindow.WriteLine($"Per item total time of {sumResultTimes}ms", Flair.Success, HEADER_AREA);
+
             //inner item rate should be larger than overall rate, as there are many items running at once.
             var innerItemRate = sumResultTimes / (decimal)RUN_COUNT;
-            _ch.Cwl($"Per item rate of {innerItemRate}ms per record");
+            _consoleWindow.WriteLine($"Per item rate of {innerItemRate}ms per record", Flair.Success, HEADER_AREA);
 
             if (_results.Count != RUN_COUNT)
             {
-                _ch.Cwl($"Results count {_results.Count} doesnt match expected run count {RUN_COUNT}", ConsoleColor.Red);
+                _consoleWindow.WriteLine($"Results count {_results.Count} doesnt match expected run count {RUN_COUNT}", Flair.Error, HEADER_AREA);
             }
 
-            var noResponse = _results.Where(r => string.IsNullOrWhiteSpace(r.ResponseMessage)).ToArray();
+            var noResponse = _results.Where(r => string.IsNullOrWhiteSpace(r.DataExchangeResult.ResponseMessage)).ToArray();
             if (noResponse.Length > 0)
             {
-                _ch.Cwl($"Results {string.Join(",", noResponse.Select(r => r.ClientId))} had empty responses", ConsoleColor.Red);
+                _consoleWindow.WriteLine($"Results {string.Join(",", noResponse.Select(r => r.ClientId))} had empty responses", Flair.Error, HEADER_AREA);
             }
             else
             {
-                var correctResponses = _results.Where(r => r.ResponseMessage.Equals($"REPLYING FROM Serverside for {r.RequestMessage.Replace(TRIGGER_TEXT, string.Empty)}", StringComparison.OrdinalIgnoreCase)).ToArray();
+                var correctResponses = _results
+                    .Where(r => r.DataExchangeResult.ResponseMessage.Equals($"REPLYING FROM Serverside for {r.RequestMessage.Replace(TRIGGER_TEXT, string.Empty)}",
+                        StringComparison.OrdinalIgnoreCase))
+                    .ToArray();
                 if (correctResponses.Length == RUN_COUNT)
                 {
-                    _ch.Cwl($"All results had correct responses", ConsoleColor.Green);
+                    _consoleWindow.WriteLine($"All results had correct responses", Flair.Success, HEADER_AREA);
                 }
                 else
                 {
-                    _ch.Cwl($"All results did not have correct responses", ConsoleColor.Red);
+                    _consoleWindow.WriteLine($"All results did not have correct responses", Flair.Error, HEADER_AREA);
                 }
-
             }
-            
+
             Console.ReadLine();
         }
 
-        private static async Task<string> ExchangeData(string message, int clientId)
+        private static async Task<OperationResult> ExecuteDataExchange(int i)
         {
-            var log = new LogEntryList();
-            var result = new StringBuilder();
-            log.Add($"{clientId} - Connecting...");
+            var result = new OperationResult {ClientId = i};
+            result.RequestMessage = $"{TRIGGER_TEXT} Clientside ident {result.ClientId}. OK?";
+            try
+            {
+                var perItemSw = Stopwatch.StartNew();
+                result.DataExchangeResult = await ExchangeData(result.RequestMessage, result.ClientId).ConfigureAwait(true);
+                perItemSw.Stop();
+                result.ElapsedMs = perItemSw.ElapsedMilliseconds;
+                _consoleWindow.WriteLines(result.DataExchangeResult.Log, Flair.Log, LOG_AREA);
+            }
+            catch (Exception e)
+            {
+                result.Ex = e;
+                _consoleWindow.WriteLine(e.Message, Flair.Error, HEADER_AREA);
+            }
+            return result;
+        }
+
+        private static async Task<DataExchangeResult> ExchangeData(string message, int clientId)
+        {
+            var dexResult = new DataExchangeResult();
+            dexResult.Log.Add($"{clientId} - Connecting...");
 
             var tc = new TcpClient();
             tc.Connect("192.168.1.2", 20000);
 
-            log.Add($"\t {clientId} - Getting Stream...");
+            dexResult.Log.Add($"\t {clientId} - Getting Stream...");
 
             var stream = tc.GetStream();
             var writer = new StreamWriter(stream) { AutoFlush = true };
             var reader = new StreamReader(stream);
 
-            log.Add($"\t {clientId} - sending {message}", ConsoleColor.Cyan);
+            dexResult.Log.Add($"\t {clientId} - sending {message}");
             await writer.WriteLineAsync(message);
             await writer.FlushAsync();
 
@@ -115,10 +148,10 @@
 
             try
             {
-                log.Add($"\t {clientId} - Getting result...");
+                dexResult.Log.Add($"\t {clientId} - Getting result...");
                 var val = await reader.ReadLineAsync();
-                result.Append(val);
-                log.Add($"\t {clientId} - Didnt fail connection");
+                dexResult.ResponseMessage = val;
+                dexResult.Log.Add($"\t {clientId} - Didnt fail connection");
             }
             catch (IOException e) //this was happening sometimes.
             {
@@ -127,27 +160,17 @@
                 //    throw;
                 //}
 
-                log.Add("${clientId} - connection dropped", ConsoleColor.Red);
-                return e.ToString();
+                dexResult.Errors.Add("${clientId} - connection dropped");
+                dexResult.ResponseMessage = e.ToString();
             }
             finally
             {
                 tc.Dispose();
             }
-            log.Add(result.ToString(), ConsoleColor.Cyan);
-            log.Add($"{clientId} - Completed");
 
-            const int STARTING_LINE = 8;
-            var currentLine = STARTING_LINE;
-            
-            foreach (var le in log.LogEntries)
-            {
-                Console.SetCursorPosition(0, currentLine);
-                _ch.Cwl(le.Msg, le.Color);
-                currentLine++;
-            }
+            dexResult.Log.Add($"{clientId} - Completed");
 
-            return result.ToString();
+            return dexResult;
         }
     }
 }

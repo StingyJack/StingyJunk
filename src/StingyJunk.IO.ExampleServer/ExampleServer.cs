@@ -1,33 +1,44 @@
 ﻿namespace StingyJunk.IO.ExampleServer
 {
     using System;
-    using System.Net;
-    using System.Linq;
-    using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
-    using ConsoleHelpers;
-    using System.Net.Sockets;
+    using System.Threading;
+    using Console;
 
-    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    [SuppressMessage("ReSharper", "UnusedParameter.Local")]
-    internal class ExampleServer
+    
+    internal static class ExampleServer
     {
         private const string TRIGGER_TEXT = "SENDING SOME DATA FROM";
-        private static readonly ConsoleHelpers _ch = new ConsoleHelpers();
+        private static ConsoleWindow _consoleWindow;
+        private const string HEADER_AREA = "HeaderArea";
+        private const string LOG_AREA = "LogArea";
 
-        private static void Main(string[] args)
+        private static void Main()
         {
-            var hostName = Dns.GetHostName();
-            var ipHostInfo = Dns.GetHostEntry(hostName);
-            var ipAddress = ipHostInfo.AddressList.FirstOrDefault(i => i.AddressFamily == AddressFamily.InterNetwork);
-            var service = new AsyncTcpListener("Listener Simulator", 20000, ipAddress);
-            
-            //all that ^ or just use the default
-            //var service = new AsyncTcpListener("Listener Simulator", 20000);
-
-            Task.Run(async () =>
+            Thread.CurrentThread.Name = nameof(ExampleServer);
+            var headerArea = new DisplayArea(HEADER_AREA, 0, 0, 7, Console.WindowWidth);
+            var logArea = new DisplayArea(LOG_AREA, headerArea.Bottom + 1, 0, Console.WindowHeight - (headerArea.Bottom + 1), Console.WindowWidth)
             {
-                service.DiagMessage += Service_DiagMessage;
+                Cycle = true
+            };
+
+            _consoleWindow = new ConsoleWindow(new[] { headerArea, logArea });
+
+            _consoleWindow.Clear();
+            _consoleWindow.WriteLine($"Locating hosting information...",Flair.Log, HEADER_AREA);
+
+            var service = new AsyncTcpListener("Listener Simulator", 20000);
+            
+            Task.Run(() =>
+            {
+                service.DiagMessage += (sender, e) =>
+                {
+                    _consoleWindow.WriteLine($"{e.Timestamp} - {e.SourceName} - {e.DiagnosticMessage}", Flair.Log, LOG_AREA);
+                };
+                service.InfoMessage += (sender, e) =>
+                {
+                    _consoleWindow.WriteLine($"{e.Timestamp} - {e.SourceName} - {e.InfoMessage}",Flair.Log, HEADER_AREA);
+                };
                 service.ResponseHandler += (sender, eventArgs) =>
                 {
                     if (eventArgs == null)
@@ -35,7 +46,7 @@
                         throw new ArgumentNullException(nameof(eventArgs));
                     }
 
-                    _ch.Cwl($"Got {eventArgs.RequestMessage}", ConsoleColor.Cyan);
+                    _consoleWindow.WriteLine($"Got {eventArgs.RequestMessage}", Flair.Log, LOG_AREA);
 
                     if (string.IsNullOrWhiteSpace(eventArgs.RequestMessage))
                     {
@@ -50,18 +61,13 @@
                         eventArgs.ResponseMessage = "W/E";
                     }
                 };
-                await service.RunAsync();
+                service.Run();
                 return Task.CompletedTask;
             });
 
-            _ch.Cwl("Press ENTER to stop listening", ConsoleColor.Yellow);
+            _consoleWindow.WriteLine("Press ENTER to stop listening", Flair.Success, HEADER_AREA);
             Console.ReadLine();
             service.Stop();
-        }
-
-        private static void Service_DiagMessage(object sender, DiagMessageEventArgs e)
-        {
-            _ch.Cwl($"{e.Timestamp} - {e.SourceName} - {e.DiagnosticMessage}", ConsoleColor.DarkYellow);
         }
     }
 }

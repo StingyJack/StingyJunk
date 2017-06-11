@@ -42,9 +42,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\ConsoleHelpers.cs">
-      <Link>ConsoleHelpers.cs</Link>
-    </Compile>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
@@ -55,9 +52,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\StingyJunk.Console\StingyJunk.Console.csproj">
+      <Project>{c5cd84f4-c154-46e7-97ee-fe5ba5ffafb7}</Project>
+      <Name>StingyJunk.Console</Name>
+    </ProjectReference>
     <ProjectReference Include="..\StingyJunk.IO\StingyJunk.IO.csproj">
       <Project>{47f9edf3-e711-4121-b819-83afdb05f071}</Project>
       <Name>StingyJunk.IO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StingyJunk\StingyJunk.csproj">
+      <Project>{6de9c742-0154-48b1-90e0-de72a6121538}</Project>
+      <Name>StingyJunk</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

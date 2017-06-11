@@ -15,7 +15,6 @@
     /// <summary>
     ///     A Task async pattern tcp socket listener  
     /// </summary>
-    [SuppressMessage("ReSharper", "EventNeverSubscribedTo.Global")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class AsyncTcpListener
     {
@@ -24,19 +23,7 @@
         public const int SUCCESS = 0;
         public const int ERROR = -1;
 
-        private TcpListener _tcpListener;
-
-        /// <summary>
-        ///     Subscribe to receive diagnostic messages
-        /// </summary>
-        public event EventHandler<DiagMessageEventArgs> DiagMessage;
-
-        public event EventHandler<InfoMessageEventArgs> InfoMessage;
-
-        /// <summary>
-        ///     Subscribe to handle replies
-        /// </summary>
-        public event EventHandler<MessageRequestResponseEventArgs> ResponseHandler;
+        private readonly List<TcpListener> _tcpListeners = new List<TcpListener>();
 
         /// <summary>
         ///     Giff naem for logging/diagnostic
@@ -44,10 +31,15 @@
         public string Name { get; set; }
 
         public int Port { get; set; }
-        
+
         public IPAddress[] IpAddresses { get; set; }
         public int Timeout { get; set; } = 1000;
-        private int _clientCounter;
+        private int _totalClientCount;
+        private int _activeClientCount;
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
+        //private SynchronizationContext _synchronizationContext = SynchronizationContext.Current;
+        //private TaskScheduler _taskScheduler = TaskScheduler.Current;
 
         #endregion //#region "fields, events, and props"
 
@@ -59,8 +51,8 @@
         /// <param name="name">Friendly name to use for diagnostics, etc</param>
         /// <param name="port">the TCP port</param>
         /// <param name="requestedIpAddress">
-        ///     A specific IP to use. If not provided, the first InterNetwork 
-        ///     address that is returned from Dns.GetHostEntry is used.
+        ///     A specific IP to use. If not provided, all the InterNetwork 
+        ///     addresses that are returned from Dns.GetHostEntry are used.
         /// </param>
         public AsyncTcpListener(string name, int port, IPAddress requestedIpAddress = null)
         {
@@ -71,7 +63,7 @@
 
             if (requestedIpAddress != null)
             {
-                IpAddresses = new [] {requestedIpAddress};
+                IpAddresses = new[] {requestedIpAddress};
             }
             else
             {
@@ -80,7 +72,7 @@
 
             if (IpAddresses == null || IpAddresses.Length == 0)
             {
-                throw new Exception("No IP address for server");
+                throw new InvalidOperationException("No IP address for server");
             }
         }
 
@@ -90,24 +82,41 @@
 
         public int Run()
         {
-            var cts = new CancellationTokenSource();
+            var returnCode = ERROR;
+
             var tasks = new List<Task>();
-            Parallel.ForEach(IpAddresses, i =>
+            try
             {
-                tasks.Add(SpawnListenerAsync(cts, i, Port));
-            });
+                Parallel.ForEach(IpAddresses, i => { tasks.Add(SpawnListenerAsync(_cancellationTokenSource, i, Port)); });
+                Task.WaitAll(tasks.ToArray(), _cancellationTokenSource.Token);
+                returnCode = SUCCESS;
+            }
+            catch (OperationCanceledException)
+            {
+                //do nothing
+            }
+            catch (Exception e)
+            {
+                Error($"General Failure", e);
+            }
+            finally
+            {
+                if (_cancellationTokenSource.IsCancellationRequested == false)
+                {
+                    Stop();
+                }
+            }
 
-            Task.WaitAll(tasks.ToArray());
-
-            return SUCCESS;
+            return returnCode;
         }
 
         private async Task SpawnListenerAsync(CancellationTokenSource cts, IPAddress ipAddress, int port)
         {
-            _tcpListener = new TcpListener(ipAddress, port);
-            _tcpListener.Start();
+            var tcpListener = new TcpListener(ipAddress, port);
+            _tcpListeners.Add(tcpListener);
+            tcpListener.Start();
 
-            Im($"{nameof(AsyncTcpListener)} {Name} is now running on {ipAddress}:{port}");
+            Info($"{nameof(AsyncTcpListener)} {Name} is now listening on {ipAddress}:{port}");
 
 
             //just fire and forget. We break from the "forgotten" async loops
@@ -115,18 +124,38 @@
 
             try
             {
-                await AcceptClientsAsync(_tcpListener, cts.Token);
+                await AcceptClientsAsync(tcpListener, cts.Token);
             }
             catch (Exception ex)
             {
-                Dm(ex.Message);
+                Error(ex.Message, ex);
                 throw;
             }
         }
 
         public void Stop()
         {
-            _tcpListener?.Stop();
+            if (_cancellationTokenSource.IsCancellationRequested)
+            {
+                Info("Stop requested, cancellation already in progress");
+            }
+            else
+            {
+                Info("Stop requested, setting cancellation");
+                _cancellationTokenSource.Cancel();
+            }
+
+            //foreach (var tl in _tcpListeners)
+            //{
+            //    try
+            //    {
+            //        tl?.Stop();
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        Error($"Failed to stop listener {tl?.LocalEndpoint}", e);
+            //    }
+            //}
         }
 
         #endregion //#region "control"
@@ -135,12 +164,13 @@
 
         private async Task AcceptClientsAsync(TcpListener listener, CancellationToken ct)
         {
-            _clientCounter = 0;
+            _totalClientCount = 0;
             while (!ct.IsCancellationRequested)
             {
-                var client = await listener.AcceptTcpClientAsync()
-                    .ConfigureAwait(false);
-                var clientId = Interlocked.Increment(ref _clientCounter);
+                var client = await listener.AcceptTcpClientAsync().ConfigureAwait(true);
+                var clientId = Interlocked.Increment(ref _totalClientCount);
+                Interlocked.Increment(ref _activeClientCount);
+                NotifyForConnStatChanges();
 
                 //once again, just fire and forget, and use the CancellationToken
                 //to signal to the "forgotten" async invocation.
@@ -148,67 +178,17 @@
 
 #pragma warning disable 4014
                 //ProcessAsync(client, clientId, ct).ConfigureAwait(false);
-                ProcessAsync(client, clientId, ct).ConfigureAwait(false);
+                ProcessAsync(client, clientId, ct).ConfigureAwait(true);
                 //Task.Run(async () => await ProcessAsync2(client, clientId, ct), ct);
 #pragma warning restore 4014
             }
         }
-
-        #region "former implementation"
-
-        /*
+        
         private async Task ProcessAsync(TcpClient tcpClient, int clientId,
             CancellationToken ct)
         {
             var clientEndPoint = tcpClient.Client.RemoteEndPoint.ToString();
-            Dm($"ClientId {clientId} requested connection from {clientEndPoint}");
-
-            using (tcpClient)
-            {
-                var networkStream = tcpClient.GetStream();
-                var reader = new StreamReader(networkStream);
-                var writer = new StreamWriter(networkStream) { AutoFlush = true };
-                while (!ct.IsCancellationRequested)
-                {
-                    // if (stream.CanTimeout) {stream.ReadTimeout = Timeout;} probably also OK here.
-                    //  but the completedTask lets whichever comes due first "win".
-                    var timeoutTask = Task.Delay(TimeSpan.FromSeconds(Timeout), ct);
-                    //var amountReadTask = stream.ReadAsync(buf, 0, buf.Length, ct);
-                    var amountReadTask = reader.ReadLineAsync();
-
-                    var completedTask = await Task.WhenAny(timeoutTask, amountReadTask).ConfigureAwait(false);
-                    if (completedTask == timeoutTask)
-                    {
-                        Dm($"\t ClientId {clientId} timed out waiting for data");
-                        break;
-                    }
-                    //now we know that the amountTask is complete so
-                    //we can ask for its Result without blocking
-                    var dataFromClient = amountReadTask.Result;
-                    if (string.IsNullOrWhiteSpace(dataFromClient))
-                    {
-                        Dm($"\t ClientId {clientId} sent no value.");
-                        break;
-                    }
-
-                    Dm($"\t ClientId {clientId} received data from client: {dataFromClient}");
-                    var response = Respond(dataFromClient);
-                    Dm($"\t ClientId {clientId} responding with {response}");
-                    await writer.WriteLineAsync(response).ConfigureAwait(false);
-                    writer.Flush();
-                }
-            }
-            Dm($"\t ClientId {clientId} disconnected");
-        }
-        */
-
-        #endregion //#region "former implementation"
-
-        private async Task ProcessAsync(TcpClient tcpClient, int clientId,
-            CancellationToken ct)
-        {
-            var clientEndPoint = tcpClient.Client.RemoteEndPoint.ToString();
-            Dm($"ClientId {clientId} requested connection from {clientEndPoint}");
+            Debug($"ClientId {clientId} requested connection from {clientEndPoint}");
 
             var networkStream = tcpClient.GetStream();
             if (networkStream.CanTimeout && networkStream.ReadTimeout > Timeout)
@@ -235,38 +215,38 @@
 
                 if (result.Length == 0)
                 {
-                    Dm($"\t ClientId {clientId} sent no value.");
+                    Debug($"\t ClientId {clientId} sent no value.");
                     return;
                 }
 
                 var dataFromClient = result.ToString();
-                Dm($"\t ClientId {clientId} received data from client: {dataFromClient}");
+                Debug($"\t ClientId {clientId} received data from client: {dataFromClient}");
                 var response = Respond(dataFromClient);
 
-                Dm($"\t ClientId {clientId} responding with {response}");
+                Debug($"\t ClientId {clientId} responding with {response}");
                 await writer.WriteLineAsync(response).ConfigureAwait(false);
                 writer.Flush();
             }
             catch (Exception e)
             {
-                Dm($"\t ClientId {clientId} timed out waiting for data");
-
-                Dm(e.Message);
+                Error($"\t ClientId {clientId} timed out waiting for data", e);
                 throw;
             }
             finally
             {
+                Interlocked.Decrement(ref _activeClientCount);
+                NotifyForConnStatChanges();
                 reader.Dispose();
                 writer.Dispose();
             }
-
-            Dm($"\t ClientId {clientId} disconnected");
+            
+            Debug($"\t ClientId {clientId} disconnected");
         }
 
         private string Respond(string request)
         {
             var rea = new MessageRequestResponseEventArgs {RequestMessage = request};
-            OnResponseHandler(rea);
+            OnResponseEventHandler(rea);
             return rea.ResponseMessage;
         }
 
@@ -274,30 +254,97 @@
 
         #region  "events and utils"
 
-        protected virtual void OnDiagMessage(DiagMessageEventArgs e)
+        /// <summary>
+        ///     Subscribe to receive diagnostic messages
+        /// </summary>
+        public event EventHandler<MessageEventArgs> DebugMessageEventHandler;
+
+        /// <summary>
+        ///     Subscribe to receive connection info messages
+        /// </summary>
+        public event EventHandler<MessageEventArgs> InfoMessageEventHandler;
+
+        /// <summary>
+        ///     Subscribe to receive connection info messages
+        /// </summary>
+        public event EventHandler<ConnectionStatsMessageEventArgs> ConnectionInfoMessageEventHandler;
+
+        /// <summary>
+        ///     Subscribe to receive error messages
+        /// </summary>
+        public event EventHandler<ErrorMessageEventArgs> ErrorMessageEventHandler;
+
+        /// <summary>
+        ///     Subscribe to handle replies to requests
+        /// </summary>
+        public event EventHandler<MessageRequestResponseEventArgs> ResponseEventHandler;
+
+        protected virtual void OnDebugMessageEventHandler(MessageEventArgs e)
         {
-            DiagMessage?.Invoke(this, e);
+            DebugMessageEventHandler?.Invoke(this, e);
         }
 
-        protected virtual void OnInfoMessage(InfoMessageEventArgs e)
+        protected virtual void OnInfoMessageEventHandler(MessageEventArgs e)
         {
-            InfoMessage?.Invoke(this, e);
+            InfoMessageEventHandler?.Invoke(this, e);
         }
 
-        protected virtual void OnResponseHandler(MessageRequestResponseEventArgs e)
+        protected virtual void OnConnectionInfoMessageEventHandler(ConnectionStatsMessageEventArgs e)
         {
-            ResponseHandler?.Invoke(this, e);
+            ConnectionInfoMessageEventHandler?.Invoke(this, e);
         }
 
-        private void Im(string message, [CallerMemberName] string methodName = null)
+        protected virtual void OnErrorMessageEventHandler(ErrorMessageEventArgs e)
         {
-            OnInfoMessage(new InfoMessageEventArgs {InfoMessage = message, Timestamp = DateTime.Now, SourceName = methodName});
+            ErrorMessageEventHandler?.Invoke(this, e);
         }
 
-
-        private void Dm(string message, [CallerMemberName] string methodName = null)
+        protected virtual void OnResponseEventHandler(MessageRequestResponseEventArgs e)
         {
-            OnDiagMessage(new DiagMessageEventArgs {DiagnosticMessage = message, Timestamp = DateTime.Now, SourceName = methodName});
+            ResponseEventHandler?.Invoke(this, e);
+        }
+
+        /// <summary>
+        ///     Writes an info message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="methodName"></param>
+        private void Info(string message, [CallerMemberName] string methodName = null)
+        {
+            OnInfoMessageEventHandler(new MessageEventArgs {Message = message, Timestamp = DateTime.Now, SourceName = methodName});
+        }
+
+        /// <summary>
+        ///     Writes the current connection stats
+        /// </summary>
+        /// <param name="methodName"></param>
+        private void NotifyForConnStatChanges([CallerMemberName] string methodName = null)
+        {
+            var connStats = new ConnectionStats {ClientConnectionsCount = _totalClientCount, ActiveClientCount = _activeClientCount};
+            var connStatsEventArgs = new ConnectionStatsMessageEventArgs {Timestamp = DateTime.Now, SourceName = methodName, Stats = connStats};
+
+            OnConnectionInfoMessageEventHandler(connStatsEventArgs);
+        }
+
+        /// <summary>
+        ///     Writes a debug message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="methodName"></param>
+        private void Debug(string message, [CallerMemberName] string methodName = null)
+        {
+            OnDebugMessageEventHandler(new MessageEventArgs {Message = message, Timestamp = DateTime.Now, SourceName = methodName});
+        }
+
+        /// <summary>
+        ///     Writes an error mesage
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="exception"></param>
+        /// <param name="methodName"></param>
+        private void Error(string message, Exception exception, [CallerMemberName] string methodName = null)
+        {
+            OnErrorMessageEventHandler(new ErrorMessageEventArgs {Message = message, Timestamp = DateTime.Now, SourceName = methodName, Exception = exception});
         }
 
         #endregion //#region  "events and utils"

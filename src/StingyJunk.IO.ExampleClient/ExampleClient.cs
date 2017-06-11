@@ -9,6 +9,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Console;
+    using System.Collections.Generic;
 
     internal static partial class ExampleClient
     {
@@ -16,21 +17,23 @@
         private static readonly ConcurrentBag<OperationResult> _results = new ConcurrentBag<OperationResult>();
         private const string TRIGGER_TEXT = "SENDING SOME DATA FROM";
         private const string HEADER_AREA = "HeaderArea";
+        private const string LOG_AREA_DEMARCATION = "LogAreaDemarcation";
         private const string LOG_AREA = "LogArea";
-
+        private static List<Task> _clientTasks = new List<Task>();
         private static void Main()
         {
             Thread.CurrentThread.Name = nameof(ExampleClient);
             //  Pausing this so server can start first when debugging this and server at the same time.
-            Thread.Sleep(2 * 1000);
+            Thread.Sleep(1 * 1000);
             var headerArea = new DisplayArea(HEADER_AREA, 0, 0, 7, Console.WindowWidth);
-            var logArea = new DisplayArea(LOG_AREA, headerArea.Bottom + 1, 0, Console.WindowHeight - (headerArea.Bottom + 1), Console.WindowWidth)
+            var logAreaDemarcation = new DisplayArea(LOG_AREA_DEMARCATION, headerArea.Bottom + 1, 0, headerArea.Bottom + 1, Console.WindowWidth) { Cycle = true };
+            var logArea = new DisplayArea(LOG_AREA, logAreaDemarcation.Bottom + 1, 0, Console.WindowHeight - (logAreaDemarcation.Bottom + 1), Console.WindowWidth)
             {
                 Cycle = true
             };
 
-            _consoleWindow = new ConsoleWindow(new[] { headerArea, logArea });
-            
+            _consoleWindow = new ConsoleWindow(new[] { headerArea, logAreaDemarcation, logArea });
+
             // ~16k is where the amount of completed connections in TIME_WAIT 
             //  that are delaying completion and the number of open connections
             //  exceeds the allowed sockets per port on this win10 machine.
@@ -40,27 +43,30 @@
             const int MAXDOP = 5;
 
             _consoleWindow.WriteLine("Starting client nag. Press ESC to stop nagging", Flair.Warning, HEADER_AREA);
-            //            var tasks = new List<Task>();
+            _consoleWindow.WriteLine($"-----------------------LOG-------------------------", Flair.Log, LOG_AREA_DEMARCATION);
+
             var overallSw = Stopwatch.StartNew();
 
             Parallel.For(0, RUN_COUNT, new ParallelOptions { MaxDegreeOfParallelism = MAXDOP }, async i =>
             {
+                _clientTasks.Add(ExecuteDataExchange(i));
                 var result = await ExecuteDataExchange(i);
                 _results.Add(result);
             });
 
             overallSw.Stop();
 
-            //          Task.WaitAll(tasks.ToArray()); //let any further console updates post before adding summary
+            Task.WaitAll(_clientTasks.ToArray()); //let any further console updates post before adding summary
 
             _consoleWindow.WriteLine($"Ran {RUN_COUNT} records in {overallSw.ElapsedMilliseconds}ms with MAXDOP of {MAXDOP}", Flair.Success, HEADER_AREA);
-            var errors = _results.Where(r => r.Ex != null).ToArray();
+            var errors = _results.Where(r => r.Ex != null || r?.DataExchangeResult?.Errors.Count > 0).ToArray();
             if (errors.Any())
             {
                 _consoleWindow.WriteLine($"There were {errors.Length} errors", Flair.Error, HEADER_AREA);
-                foreach (var err in errors)
+                var firstFew = errors.Take(Math.Min(5, errors.Length));
+                foreach (var err in firstFew)
                 {
-                    _consoleWindow.WriteLine($"\t client {err.ClientId}: {err.Ex}", Flair.Error, HEADER_AREA);
+                    _consoleWindow.WriteLine($"{err.WithErrors()}", Flair.Error, LOG_AREA);
                 }
             }
 
@@ -105,15 +111,17 @@
 
         private static async Task<OperationResult> ExecuteDataExchange(int i)
         {
-            var result = new OperationResult {ClientId = i};
+            var result = new OperationResult { ClientId = i };
             result.RequestMessage = $"{TRIGGER_TEXT} Clientside ident {result.ClientId}. OK?";
+            if (i % 3 == 0)
+            { result.RequestMessage = "NO"; }
             try
             {
                 var perItemSw = Stopwatch.StartNew();
                 result.DataExchangeResult = await ExchangeData(result.RequestMessage, result.ClientId).ConfigureAwait(true);
                 perItemSw.Stop();
                 result.ElapsedMs = perItemSw.ElapsedMilliseconds;
-                _consoleWindow.WriteLines(result.DataExchangeResult.Log, Flair.Log, LOG_AREA);
+                //_consoleWindow.WriteLines(result.DataExchangeResult.Log, Flair.Log, LOG_AREA);
             }
             catch (Exception e)
             {
@@ -151,6 +159,10 @@
                 dexResult.Log.Add($"\t {clientId} - Getting result...");
                 var val = await reader.ReadLineAsync();
                 dexResult.ResponseMessage = val;
+                if (dexResult.ResponseMessage.IndexOf($"REPLYING FROM Serverside for  Clientside ident {clientId}", StringComparison.OrdinalIgnoreCase) < 0)
+                {
+                    dexResult.Errors.Add($"Invalid Response '{dexResult.ResponseMessage}'");
+                }
                 dexResult.Log.Add($"\t {clientId} - Didnt fail connection");
             }
             catch (IOException e) //this was happening sometimes.

@@ -36,10 +36,10 @@ namespace StingyJunk.Console
 
         public void WriteMessage(Position writePosition, string message, Flair flair)
         {
-            Debug.WriteLine($"start queue for write {message}");
+            Dwl($"start queue for write {message}");
             if (_acceptNewItems == false)
             {
-                Debug.WriteLine($"ignored request to write {message}");
+                Dwl($"ignored request to write {message}");
                 return;
             }
             lock (_groupLock)
@@ -52,11 +52,11 @@ namespace StingyJunk.Console
         public void WriteMessages(IEnumerable<ConsoleMessage> consoleMessages)
         {
             var messages = consoleMessages as ConsoleMessage[] ?? consoleMessages.ToArray();
-            Debug.WriteLine($"start request to write {messages.Select(m => m.Message).ToList().ToNewLineList()}");
+            Dwl($"start request to write {messages.Select(m => m.Message).ToList().ToNewLineList()}");
 
             if (_acceptNewItems == false)
             {
-                Debug.WriteLine($"ignored request to write message group");
+                Dwl($"ignored request to write message group");
                 return;
             }
 
@@ -109,11 +109,35 @@ namespace StingyJunk.Console
                 Console.SetCursorPosition(cm.WritePosition.Left, cm.WritePosition.Top);
                 Console.ForegroundColor = cm.Flair.ForegroundColor;
                 Console.BackgroundColor = cm.Flair.BackgroundColor;
-                var paddedMessage = $"{cm.Message}{new string(' ', Console.WindowWidth)}".Substring(0,Console.WindowWidth -1);
-                Debug.WriteLine($"{cm.WritePosition} : '{paddedMessage}'");
+                var msgToWrite = cm.Message;
+                var width = ConsoleWidth();
+                Dwl($"{nameof(msgToWrite)} ({msgToWrite.Length}), console window width {width}. console buffer width {Console.BufferWidth}");
+                if (msgToWrite.Length < width)
+                {
+                    var padding = new string(' ', width -1 - cm.Message.Length);
+                    var whitespaceCleanedMessage = $"{cm.Message}{padding}";
+                    Dwl($"{nameof(msgToWrite)} ({msgToWrite.Length}) is less than the console window width ({width}), padding with {padding.Length} spaces to be {whitespaceCleanedMessage.Length}");
+                    
+                    msgToWrite = whitespaceCleanedMessage;
+
+                }
+
+                Dwl($"{cm.WritePosition} : '{msgToWrite}'");
                 
-                Console.WriteLine(paddedMessage);
+                Console.WriteLine(msgToWrite);
             }
         }
+
+
+        private static int ConsoleWidth()
+        {
+            return Console.WindowWidth;
+        }
+
+        private void Dwl(string message)
+        {
+            Debug.WriteLine($"{nameof(QueuedWriter)} - {DateTime.Now.TimeOfDay} - {message} ");
+        }
+
     }
 }

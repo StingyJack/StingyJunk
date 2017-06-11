@@ -12,6 +12,8 @@
         //private Position _lastWritePosition;
         private Position _writePosition;
 
+        private int _messageLinesForWritePosition;
+
         public DisplayArea(string name, int top, int left, int bottom, int right)
         {
             Name = name;
@@ -42,7 +44,7 @@
         public int Left { get; }
 
         /// <summary>
-        /// The right most column
+        /// The right most column. This is not yet implemented
         /// </summary>
         public int Right { get; }
 
@@ -58,36 +60,21 @@
         /// </summary>
         public bool Scroll { get; set; }
 
-        /// <summary>
-        ///     The last write position for this display area
-        /// </summary>
-        //internal Position LastWritePosition
-        //{
-        //    get => _lastWritePosition;
-        //    private set
-        //    {
-        //        _lastWritePosition = value;
-        //        IsCherryPop = true;
-        //    }
-        //}
-
+   
         /// <summary>
         ///     The current write position
         /// </summary>
-        internal Position WritePosition
-        {
-            get => _writePosition;
-            private set => _writePosition = value;
-        }
+        internal Position WritePosition => _writePosition;
 
-        internal void SetWritePosition(Position writePosition)
+        internal int MessageLinesForWritePosition => _messageLinesForWritePosition;
+
+        internal void SetWritePosition(Position writePosition, int messageLength)
         {
-            IsCherryPop = true;
-           // Interlocked.CompareExchange(ref _lastWritePosition, _writePosition, _lastWritePosition);
             Interlocked.CompareExchange(ref _writePosition, writePosition, _writePosition);
+            Interlocked.CompareExchange(ref _messageLinesForWritePosition, messageLength, _messageLinesForWritePosition);
         }
 
 
-        internal bool IsCherryPop { get; private set; }
+        
     }
 }

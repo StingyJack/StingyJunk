@@ -2,10 +2,10 @@ namespace StingyJunk.IO
 {
     using System;
 
-    public class DiagMessageEventArgs : EventArgs
+    public class MessageEventArgs : EventArgs
     {
         public string SourceName { get; set; }
         public DateTime Timestamp { get; set; }
-        public string DiagnosticMessage { get; set; }
+        public string Message { get; set; }
     }
 }

@@ -50,8 +50,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Compile Include="AsyncTcpListener.cs" />
-    <Compile Include="DiagMessageEventArgs.cs" />
-    <Compile Include="InfoMessageEventArgs.cs" />
+    <Compile Include="ConnectionStats.cs" />
+    <Compile Include="ErrorMessageEventArgs.cs" />
+    <Compile Include="ConnectionStatsMessageEventArgs.cs" />
+    <Compile Include="MessageEventArgs.cs" />
     <Compile Include="MessageRequestResponseEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -52,6 +52,11 @@
             {
                 throw new InvalidOperationException("DisplayArea must be named when more than one are registered");
             }
+
+            if (_displayAreas.ContainsKey(displayAreaName) == false)
+            {
+                throw new ArgumentException($"{nameof(displayAreaName)} '{displayAreaName}' not registered");
+            }
         }
     }
 }

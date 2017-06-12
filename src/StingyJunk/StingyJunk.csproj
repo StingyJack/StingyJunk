@@ -339,6 +339,7 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Extensions\Lists.cs" />
     <Compile Include="Extensions\Serialization.cs" />
     <Compile Include="Extensions\Bools.cs" />
     <Compile Include="Extensions\Strings.cs" />

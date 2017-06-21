@@ -11,7 +11,7 @@
     using Console;
     using System.Collections.Generic;
 
-    internal static partial class ExampleClient
+    public static class ExampleAsyncTcpClient
     {
         private static ConsoleWindow _consoleWindow;
         private static readonly ConcurrentBag<OperationResult> _results = new ConcurrentBag<OperationResult>();
@@ -20,9 +20,10 @@
         private const string LOG_AREA_DEMARCATION = "LogAreaDemarcation";
         private const string LOG_AREA = "LogArea";
         private static List<Task> _clientTasks = new List<Task>();
-        private static void Main()
+
+        public static void Run()
         {
-            Thread.CurrentThread.Name = nameof(ExampleClient);
+            Thread.CurrentThread.Name = nameof(ExampleAsyncTcpClient);
             //  Pausing this so server can start first when debugging this and server at the same time.
             Thread.Sleep(1 * 1000);
             var headerArea = new DisplayArea(HEADER_AREA, 0, 0, 7, Console.WindowWidth);
@@ -33,6 +34,7 @@
             };
 
             _consoleWindow = new ConsoleWindow(new[] { headerArea, logAreaDemarcation, logArea });
+            _consoleWindow.Clear();
 
             // ~16k is where the amount of completed connections in TIME_WAIT 
             //  that are delaying completion and the number of open connections

@@ -67,8 +67,6 @@
     <None Include="app.config" />
     <Compile Include="ConsoleWindow.DisplayAreas.cs" />
     <None Include="FodyWeavers.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

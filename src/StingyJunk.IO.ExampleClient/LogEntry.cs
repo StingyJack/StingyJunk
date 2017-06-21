@@ -2,18 +2,15 @@
 {
     using System;
 
-    internal static partial class ExampleClient
+    public class LogEntry
     {
-        public class LogEntry
-        {
-            public string Msg { get; set; }
-            public ConsoleColor? Color { get; set; }
+        public string Msg { get; set; }
+        public ConsoleColor? Color { get; set; }
 
-            public LogEntry(string msg, ConsoleColor? color = null)
-            {
-                Msg = msg;
-                Color = color;
-            }
+        public LogEntry(string msg, ConsoleColor? color = null)
+        {
+            Msg = msg;
+            Color = color;
         }
     }
 }

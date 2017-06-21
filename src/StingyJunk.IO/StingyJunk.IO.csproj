@@ -32,6 +32,25 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http, Version=4.1.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\Packages\System.Net.Http.4.3.2\lib\net46\System.Net.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.Cryptography.Algorithms, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\Packages\System.Security.Cryptography.Algorithms.4.3.0\lib\net461\System.Security.Cryptography.Algorithms.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Encoding, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\Packages\System.Security.Cryptography.Encoding.4.3.0\lib\net46\System.Security.Cryptography.Encoding.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Pkcs, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\Packages\System.Security.Cryptography.Pkcs.4.3.0\lib\net46\System.Security.Cryptography.Pkcs.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\Packages\System.Security.Cryptography.Primitives.4.3.0\lib\net46\System.Security.Cryptography.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.X509Certificates, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\Packages\System.Security.Cryptography.X509Certificates.4.3.0\lib\net461\System.Security.Cryptography.X509Certificates.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ConsoleHelpers.cs">
@@ -41,23 +60,36 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Content Include="..\StingyJunk.IO.ExampleClient\ExampleClient.cs">
-      <Link>Examples\ExampleClient.cs</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\StingyJunk.IO.ExampleServer\ExampleServer.cs">
       <Link>Examples\ExampleServer.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="..\StingyJunk.IO.ExampleClient\ExampleAs2Client.cs">
+      <Link>Examples\ExampleAs2Client.cs</Link>
+    </None>
+    <None Include="..\StingyJunk.IO.ExampleClient\ExampleAsyncTcpClient.cs">
+      <Link>Examples\ExampleAsyncTcpClient.cs</Link>
+    </None>
     <Compile Include="AsyncTcpListener.cs" />
     <Compile Include="ConnectionStats.cs" />
     <Compile Include="ErrorMessageEventArgs.cs" />
     <Compile Include="ConnectionStatsMessageEventArgs.cs" />
     <Compile Include="MessageEventArgs.cs" />
     <Compile Include="MessageRequestResponseEventArgs.cs" />
+    <Compile Include="Odd\As2Client.cs" />
+    <Compile Include="Odd\As2Request.cs" />
+    <Compile Include="Odd\As2Response.cs" />
+    <Compile Include="Odd\CertInfo.cs" />
+    <Compile Include="Odd\Credentials.cs" />
+    <Compile Include="Odd\CryptoAlterations.cs" />
+    <Compile Include="Odd\EncryptionAlgorithm.cs" />
+    <Compile Include="Odd\EncryptionUtils.cs" />
+    <Compile Include="Odd\IAs2Client.cs" />
+    <Compile Include="Odd\MimeUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="StingyJunk.IO.nuspec" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

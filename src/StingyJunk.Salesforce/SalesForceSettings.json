@@ -1,0 +1,8 @@
+﻿{
+  "SecurityToken": "changeme",
+  "ConsumerKey": "changeme",
+  "ConsumerSecret": "changeme",
+  "UserName": "changeme",
+  "Password": "changeme",
+  "IsSandboxUser": true
+}

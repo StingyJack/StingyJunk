@@ -1,4 +1,4 @@
-﻿namespace StingyJunk
+﻿namespace StingyJunk.Attributes
 {
     using System;
 

@@ -1,10 +1,10 @@
-﻿namespace StingyJunk
+﻿namespace StingyJunk.Bases
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
     using log4net;
-     
+
     /// <summary>
     ///     Base that provides logging
     /// </summary>

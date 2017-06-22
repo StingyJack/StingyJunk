@@ -5,6 +5,8 @@ namespace StingyJunk.Tfs
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Bases;
+    using Config;
     using Microsoft.Extensions.Configuration;
     using Microsoft.TeamFoundation.Core.WebApi;
     using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
@@ -15,7 +17,7 @@ namespace StingyJunk.Tfs
     /// <summary>
     ///     Provides base Tfs Connection and cached config info
     /// </summary>
-    /// <seealso cref="StingyJunk.LoggableBase" />
+    /// <seealso cref="LoggableBase" />
     public abstract class TfsConnectedBase : LoggableBase
     {
         #region "props and fields"
@@ -37,12 +39,12 @@ namespace StingyJunk.Tfs
         /// <exception cref="System.ArgumentException"></exception>
         protected void LoadTfsConfiguration(IConfigurationRoot configRoot)
         {
-            var tfsConfig = new TfsConfiguration();
+            var tfsConfig = new SystemInstances();
             configRoot.Bind(tfsConfig);
             LoadTfsConfiguration(tfsConfig);
         }
 
-        protected void LoadTfsConfiguration(TfsConfiguration tfsConfig)
+        protected void LoadTfsConfiguration(SystemInstances tfsConfig)
         {
             if (tfsConfig.IsValid == false)
             {

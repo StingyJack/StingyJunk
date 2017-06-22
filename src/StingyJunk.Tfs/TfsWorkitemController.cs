@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Config;
     using Microsoft.Extensions.Configuration;
     using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
@@ -31,10 +32,10 @@
         /// <summary>
         ///     Initializes a new instance of the <see cref="TfsWorkitemController"/> class.
         /// </summary>
-        /// <param name="tfsConfiguration">The TFS configuration.</param>
-        public TfsWorkitemController(TfsConfiguration tfsConfiguration)
+        /// <param name="systemInstances">The TFS configuration.</param>
+        public TfsWorkitemController(SystemInstances systemInstances)
         {
-            LoadTfsConfiguration(tfsConfiguration);
+            LoadTfsConfiguration(systemInstances);
         }
 
         #endregion //#region "public interface members"

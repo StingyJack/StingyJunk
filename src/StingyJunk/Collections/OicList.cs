@@ -1,4 +1,4 @@
-﻿namespace StingyJunk
+﻿namespace StingyJunk.Collections
 {
     using System;
     using System.Collections.Generic;

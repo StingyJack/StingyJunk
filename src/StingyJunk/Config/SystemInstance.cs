@@ -1,25 +1,25 @@
 ﻿// ReSharper disable ClassNeverInstantiated.Global
-namespace StingyJunk.Tfs
+namespace StingyJunk.Config
 {
     /// <summary>
-    ///      A Tfs Instance
+    ///      A System Instance
     /// </summary>
-    public class TfsInstance
+    public class SystemInstance
     {
         /// <summary>
-        ///     Initializes a new instance of the <see cref="TfsInstance"/> class.
+        ///     Initializes a new instance of the <see cref="SystemInstance"/> class.
         /// </summary>
-        public TfsInstance()
+        public SystemInstance()
         {
             
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="TfsInstance" /> class.
+        ///     Initializes a new instance of the <see cref="SystemInstance" /> class.
         /// </summary>
-        /// <param name="autoLoadInstanceMetaData">if set to <c>true</c> [automatic load instance meta data].</param>
+        /// <param name="instanceUrl">if set to <c>true</c> [automatic load instance meta data].</param>
         /// <param name="instanceUrl">The instance URL.</param>
-        public TfsInstance(bool autoLoadInstanceMetaData, string instanceUrl)
+        public SystemInstance(bool autoLoadInstanceMetaData, string instanceUrl)
         {
             AutoLoadInstanceMetaData = autoLoadInstanceMetaData;
             InstanceUrl = instanceUrl;

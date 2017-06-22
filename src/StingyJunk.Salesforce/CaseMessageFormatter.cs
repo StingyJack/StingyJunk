@@ -1,10 +1,7 @@
-﻿namespace StingyJunk.SalesForce
+﻿namespace StingyJunk.Salesforce
 {
     using System.Collections.Generic;
-    
-    using Salesforce;
-    using Salesforce.Models;
-    
+    using Models;
 
     public class CaseMessageFormatter 
     {

@@ -6,6 +6,7 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using Collections;
     using Extensions;
 
     public partial class ConsoleWindow

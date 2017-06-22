@@ -34,12 +34,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs">
@@ -59,10 +53,6 @@
     <ProjectReference Include="..\StingyJunk.IO\StingyJunk.IO.csproj">
       <Project>{47f9edf3-e711-4121-b819-83afdb05f071}</Project>
       <Name>StingyJunk.IO</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\StingyJunk\StingyJunk.csproj">
-      <Project>{6de9c742-0154-48b1-90e0-de72a6121538}</Project>
-      <Name>StingyJunk</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,13 +1,14 @@
-﻿namespace StingyJunk.Tfs
+﻿namespace StingyJunk.Config
 {
     using System.Collections.Generic;
 
-    public class TfsConfiguration
+    //TODO: Change this to SystemInstances and move tfs specific stuff to .Tfs assembly 
+    public class SystemInstances
     {
         /// <summary>
         ///     Base instance urls
         /// </summary>
-        public List<TfsInstance> Instances { get; } = new List<TfsInstance>();
+        public List<SystemInstance> Instances { get; } = new List<SystemInstance>();
 
         public int MaxRecordsInResultSets { get; set; }
 

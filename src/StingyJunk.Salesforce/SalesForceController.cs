@@ -8,7 +8,6 @@
     using StingyJunk.Extensions;
     using Microsoft.Extensions.Configuration;
     using Models;
-    using SalesForce;
 
 
     public class SalesForceController 

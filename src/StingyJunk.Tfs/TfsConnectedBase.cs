@@ -1,5 +1,4 @@
-﻿// ReSharper disable VirtualMemberNeverOverridden.Global
-namespace StingyJunk.Tfs
+﻿namespace StingyJunk.Tfs
 {
     using System;
     using System.Collections.Generic;
@@ -200,6 +199,5 @@ namespace StingyJunk.Tfs
         }
 
         #endregion //#region "client members"
-        
     }
 }

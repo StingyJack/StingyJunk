@@ -3,21 +3,20 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using Extensions;
     using global::Salesforce.Common;
     using global::Salesforce.Force;
-    using StingyJunk.Extensions;
     using Microsoft.Extensions.Configuration;
     using Models;
 
-
-    public class SalesForceController 
+    public class SalesForceController
     {
         private SalesForceSettings _settings;
         private ForceClient _client; //this is a Service user account
         private const int MAX_CASES_TO_SHOW = 5;
 
         private CaseMessageFormatter _caseMessageFormatter;
-       
+
         #region "public interface members"
 
         public void Configure(IConfigurationRoot configRoot)
@@ -40,7 +39,6 @@
             GetClientAsync().GetAwaiter().GetResult();
         }
 
-  
         #endregion //#region "public interface members"
 
         protected virtual async Task<ForceClient> GetClientAsync()
@@ -65,7 +63,6 @@
         //https://github.com/developerforce/Force.com-Toolkit-for-NET/blob/master/samples/SimpleConsole/Program.cs
         public async Task<Message> GetCaseDetailsAsync(string caseNumber)
         {
-            
             var commentProps = new CaseComment().GetCommaSepListOfPropNames();
             var caseQuery = "SELECT Id, CaseNumber, Subject, Description, CreatedDate, OwnerId, LastModifiedDate, IsClosed, Priority " +
                             " , Account.Name " +
@@ -87,22 +84,21 @@
 
             if (result.Records.Count == 0)
             {
-                return new Message { Text = $"records not found for case {caseNumber}" };
+                return new Message {Text = $"records not found for case {caseNumber}"};
             }
             if (result.Records.Count > 1)
             {
                 var matchingCaseNumbers = string.Join(",", result.Records.Select(c => c.CaseNumber));
-                return new Message { Text = $"Multiple records found {matchingCaseNumbers}" };
+                return new Message {Text = $"Multiple records found {matchingCaseNumbers}"};
             }
-            
+
             var sfCase = result.Records.First();
-            
+
             return _caseMessageFormatter.GetCaseMessage(sfCase);
         }
 
         public async Task<Message> GetCaseListAsync(Message messageContext)
         {
-
             var caseQuery = "SELECT Id, CaseNumber, Subject, Description, CreatedDate, OwnerId, LastModifiedDate, IsClosed, Priority " +
                             " , Account.Name " +
                             " FROM Case " +
@@ -115,10 +111,10 @@
             if (result.Records.Count == 0)
             {
                 //TODO: move to messsage formatter
-                return new Message { Text = "Case records not found" };
+                return new Message {Text = "Case records not found"};
             }
 
-         
+
             var headerText = $"Found {result.Records.Count} cases.";
             if (result.Records.Count > MAX_CASES_TO_SHOW)
             {
@@ -126,7 +122,7 @@
             }
             var casesMessage = new Message
             {
-                Text = headerText,
+                Text = headerText
             };
             var att = new Attachment();
             var currentCount = 1;
@@ -135,8 +131,7 @@
                 att.Fields.Add(new AttachmentField
                 {
                     Title = $"Details for case {sfCase.CaseNumber}",
-                    Value = $"{sfCase.CreatedDateShort} - {sfCase.Account.Name} - {sfCase.Subject}",
-                    
+                    Value = $"{sfCase.CreatedDateShort} - {sfCase.Account.Name} - {sfCase.Subject}"
                 });
                 currentCount++;
                 if (currentCount > MAX_CASES_TO_SHOW)

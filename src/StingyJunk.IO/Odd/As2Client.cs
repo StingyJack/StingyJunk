@@ -1,5 +1,6 @@
 ﻿namespace StingyJunk.IO.Odd
 {
+    using Extensions;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -9,12 +10,11 @@
     using System.Net.Http.Headers;
     using System.Text;
 
-    
     public class As2Client : IAs2Client
     {
         private readonly string _serverUrl;
         private readonly HttpClient _httpClient;
-      
+
         public int TimeoutMs { get; set; } = 3000;
 
         public As2Client(string serverUrl)
@@ -31,11 +31,11 @@
 
         public As2Response Send(As2Request request)
         {
-            return Send(request.Data, request.FromAddress, request.ToAddress, request.FileName, 
+            return Send(request.Data, request.FromAddress, request.ToAddress, request.FileName,
                 request.CertificateInfo, request.ContentType);
         }
 
-        public As2Response Send(Stream data, string fromAddress, string toAddress, string fileName, 
+        public As2Response Send(Stream data, string fromAddress, string toAddress, string fileName,
             CertInfo certificateInfo = null, string specifiedContentType = null)
         {
             var headers = new Dictionary<string, string>
@@ -99,9 +99,7 @@
 
         private CryptoAlterations PerformEncryptionOrSigning(Stream data, CertInfo certificateInfo, string startingContentType)
         {
-            var ms = new MemoryStream();
-            data.CopyTo(ms);
-            var content = ms.ToArray();
+            var content = data.ToBytes();
             var returnValue = new CryptoAlterations();
             var alteredContentType = startingContentType;
 

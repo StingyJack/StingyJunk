@@ -60,7 +60,7 @@
         /// </summary>
         public bool Scroll { get; set; }
 
-   
+
         /// <summary>
         ///     The current write position
         /// </summary>
@@ -73,8 +73,5 @@
             Interlocked.CompareExchange(ref _writePosition, writePosition, _writePosition);
             Interlocked.CompareExchange(ref _messageLinesForWritePosition, messageLength, _messageLinesForWritePosition);
         }
-
-
-        
     }
 }

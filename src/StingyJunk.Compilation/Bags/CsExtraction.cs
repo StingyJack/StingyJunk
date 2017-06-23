@@ -1,5 +1,4 @@
-﻿// ReSharper disable UnusedAutoPropertyAccessor.Global
-namespace StingyJunk.Compilation.Bags
+﻿namespace StingyJunk.Compilation.Bags
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;

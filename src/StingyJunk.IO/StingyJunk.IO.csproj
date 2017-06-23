@@ -58,7 +58,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Compile Include="..\SharedAssemblyInfo.cs">
-      <Link>SharedAssemblyInfo.cs</Link>
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Content Include="..\StingyJunk.IO.ExampleServer\ExampleServer.cs">
       <Link>Examples\ExampleServer.cs</Link>
@@ -91,6 +91,12 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="StingyJunk.IO.nuspec" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\StingyJunk\StingyJunk.csproj">
+      <Project>{6de9c742-0154-48b1-90e0-de72a6121538}</Project>
+      <Name>StingyJunk</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

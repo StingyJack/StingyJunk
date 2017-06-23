@@ -1,6 +1,4 @@
-﻿// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable All
-namespace StingyJunk.Analyzers.Test.Helpers
+﻿namespace StingyJunk.Analyzers.Test.Helpers
 {
     using System;
     using Microsoft.CodeAnalysis;
@@ -43,10 +41,7 @@ namespace StingyJunk.Analyzers.Test.Helpers
         {
             get { return _locations ?? (_locations = new DiagnosticResultLocation[] { }); }
 
-            set
-            {
-                _locations = value;
-            }
+            set { _locations = value; }
         }
 
         public DiagnosticSeverity Severity { get; set; }
@@ -57,26 +52,17 @@ namespace StingyJunk.Analyzers.Test.Helpers
 
         public string Path
         {
-            get
-            {
-                return Locations.Length > 0 ? Locations[0].Path : "";
-            }
+            get { return Locations.Length > 0 ? Locations[0].Path : ""; }
         }
 
         public int Line
         {
-            get
-            {
-                return Locations.Length > 0 ? Locations[0].Line : -1;
-            }
+            get { return Locations.Length > 0 ? Locations[0].Line : -1; }
         }
 
         public int Column
         {
-            get
-            {
-                return Locations.Length > 0 ? Locations[0].Column : -1;
-            }
+            get { return Locations.Length > 0 ? Locations[0].Column : -1; }
         }
     }
 }

@@ -28,7 +28,7 @@
                 throw new InvalidOperationException("No Raw Response available");
             }
         }
-        
+
         public List<string> FlattenedHeaders
         {
             get

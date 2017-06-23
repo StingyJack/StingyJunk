@@ -171,7 +171,7 @@
 
             var footer = Encoding.ASCII.GetBytes($"--{stringBoundary}--{Environment.NewLine}");
 
-            var finalMessage = ConcatBytes(boundary, messageData, boundary,signatureHeader, encodedSignature, footer);
+            var finalMessage = ConcatBytes(boundary, messageData, boundary, signatureHeader, encodedSignature, footer);
 
             return new Tuple<byte[], string>(finalMessage, contentType);
         }

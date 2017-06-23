@@ -1,5 +1,4 @@
-﻿// ReSharper disable UnusedMember.Global
-namespace StingyJunk.Analyzers.Test.Verifiers
+﻿namespace StingyJunk.Analyzers.Test.Verifiers
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -15,6 +14,7 @@ namespace StingyJunk.Analyzers.Test.Verifiers
     public abstract class DiagnosticVerifier
     {
         #region To be implemented by Test classes
+
         /// <summary>
         /// Get the CSharp analyzer being tested - to be implemented in non-abstract class
         /// </summary>
@@ -30,6 +30,7 @@ namespace StingyJunk.Analyzers.Test.Verifiers
         {
             return null;
         }
+
         #endregion
 
         #region Verifier wrappers
@@ -42,7 +43,7 @@ namespace StingyJunk.Analyzers.Test.Verifiers
         /// <param name="expected"> DiagnosticResults that should appear after the analyzer is run on the source</param>
         protected void VerifyCSharpDiagnostic(string source, params DiagnosticResult[] expected)
         {
-            VerifyDiagnostics(new[] { source }, LanguageNames.CSharp, GetCSharpDiagnosticAnalyzer(), expected);
+            VerifyDiagnostics(new[] {source}, LanguageNames.CSharp, GetCSharpDiagnosticAnalyzer(), expected);
         }
 
         /// <summary>
@@ -53,7 +54,7 @@ namespace StingyJunk.Analyzers.Test.Verifiers
         /// <param name="expected">DiagnosticResults that should appear after the analyzer is run on the source</param>
         protected void VerifyBasicDiagnostic(string source, params DiagnosticResult[] expected)
         {
-            VerifyDiagnostics(new[] { source }, LanguageNames.VisualBasic, GetBasicDiagnosticAnalyzer(), expected);
+            VerifyDiagnostics(new[] {source}, LanguageNames.VisualBasic, GetBasicDiagnosticAnalyzer(), expected);
         }
 
         /// <summary>
@@ -95,6 +96,7 @@ namespace StingyJunk.Analyzers.Test.Verifiers
         #endregion
 
         #region Actual comparisons and verifications
+
         /// <summary>
         /// Checks each of the actual Diagnostics found and compares them with the corresponding DiagnosticResult in the array of expected results.
         /// Diagnostics are considered equal only if the DiagnosticResultLocation, Id, Severity, and Message of the DiagnosticResult match the actual diagnostic.
@@ -104,19 +106,19 @@ namespace StingyJunk.Analyzers.Test.Verifiers
         /// <param name="expectedResults">Diagnostic Results that should have appeared in the code</param>
         private static void VerifyDiagnosticResults(IEnumerable<Diagnostic> actualResults, DiagnosticAnalyzer analyzer, params DiagnosticResult[] expectedResults)
         {
-            int expectedCount = expectedResults.Length;
+            var expectedCount = expectedResults.Length;
             var diagnostics = actualResults as IList<Diagnostic> ?? actualResults.ToList();
-            int actualCount = diagnostics.Count;
+            var actualCount = diagnostics.Count;
 
             if (expectedCount != actualCount)
             {
-                string diagnosticsOutput = diagnostics.Any() ? FormatDiagnostics(analyzer, diagnostics.ToArray()) : "    NONE.";
+                var diagnosticsOutput = diagnostics.Any() ? FormatDiagnostics(analyzer, diagnostics.ToArray()) : "    NONE.";
 
                 Assert.IsTrue(false,
                     $"Mismatch between number of diagnostics returned, expected \"{expectedCount}\" actual \"{actualCount}\"\r\n\r\nDiagnostics:\r\n{diagnosticsOutput}\r\n");
             }
 
-            for (int i = 0; i < expectedResults.Length; i++)
+            for (var i = 0; i < expectedResults.Length; i++)
             {
                 var actual = diagnostics.ElementAt(i);
                 var expected = expectedResults[i];
@@ -140,7 +142,7 @@ namespace StingyJunk.Analyzers.Test.Verifiers
                             $"Expected {expected.Locations.Length - 1} additional locations but got {additionalLocations.Length} for Diagnostic:\r\n    {FormatDiagnostics(analyzer, actual)}\r\n");
                     }
 
-                    for (int j = 0; j < additionalLocations.Length; ++j)
+                    for (var j = 0; j < additionalLocations.Length; ++j)
                     {
                         VerifyDiagnosticLocation(analyzer, actual, additionalLocations[j], expected.Locations[j + 1]);
                     }
@@ -177,7 +179,7 @@ namespace StingyJunk.Analyzers.Test.Verifiers
         {
             var actualSpan = actual.GetLineSpan();
 
-            Assert.IsTrue(actualSpan.Path == expected.Path || (actualSpan.Path != null && actualSpan.Path.Contains("Test0.") && expected.Path.Contains("Test.")),
+            Assert.IsTrue(actualSpan.Path == expected.Path || actualSpan.Path != null && actualSpan.Path.Contains("Test0.") && expected.Path.Contains("Test."),
                 $"Expected diagnostic to be in file \"{expected.Path}\" was actually in file \"{actualSpan.Path}\"\r\n\r\nDiagnostic:\r\n    {FormatDiagnostics(analyzer, diagnostic)}\r\n");
 
             var actualLinePosition = actualSpan.StartLinePosition;
@@ -202,9 +204,11 @@ namespace StingyJunk.Analyzers.Test.Verifiers
                 }
             }
         }
+
         #endregion
 
         #region Formatting Diagnostics
+
         /// <summary>
         /// Helper method to format a Diagnostic into an easily readable string
         /// </summary>
@@ -214,7 +218,7 @@ namespace StingyJunk.Analyzers.Test.Verifiers
         private static string FormatDiagnostics(DiagnosticAnalyzer analyzer, params Diagnostic[] diagnostics)
         {
             var builder = new StringBuilder();
-            for (int i = 0; i < diagnostics.Length; ++i)
+            for (var i = 0; i < diagnostics.Length; ++i)
             {
                 builder.AppendLine("// " + diagnostics[i]);
 
@@ -235,7 +239,7 @@ namespace StingyJunk.Analyzers.Test.Verifiers
                             Assert.IsTrue(location.IsInSource,
                                 $"Test base does not currently handle diagnostics in metadata locations. Diagnostic in metadata: {diagnostics[i]}\r\n");
 
-                            string resultMethodName = diagnostics[i].Location.SourceTree.FilePath.EndsWith(".cs") ? "GetCSharpResultAt" : "GetBasicResultAt";
+                            var resultMethodName = diagnostics[i].Location.SourceTree.FilePath.EndsWith(".cs") ? "GetCSharpResultAt" : "GetBasicResultAt";
                             var linePosition = diagnostics[i].Location.GetLineSpan().StartLinePosition;
 
                             builder.AppendFormat("{0}({1}, {2}, {3}.{4})",
@@ -258,6 +262,7 @@ namespace StingyJunk.Analyzers.Test.Verifiers
             }
             return builder.ToString();
         }
+
         #endregion
     }
 }

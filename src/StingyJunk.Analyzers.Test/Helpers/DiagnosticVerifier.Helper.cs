@@ -1,5 +1,4 @@
-﻿// ReSharper disable All
-namespace StingyJunk.Analyzers.Test.Helpers
+﻿namespace StingyJunk.Analyzers.Test.Helpers
 {
     using System;
     using System.Collections.Generic;
@@ -68,7 +67,8 @@ namespace StingyJunk.Analyzers.Test.Helpers
                     }
                     else
                     {
-                        foreach (var document in documents) {
+                        foreach (var document in documents)
+                        {
                             var tree = document.GetSyntaxTreeAsync().Result;
                             if (tree == diag.Location.SourceTree)
                             {
@@ -97,6 +97,7 @@ namespace StingyJunk.Analyzers.Test.Helpers
         #endregion
 
         #region Set up compilation and documents
+
         /// <summary>
         /// Given an array of strings as sources and a language, turn them into a project and return the documents and spans of it.
         /// </summary>
@@ -129,7 +130,7 @@ namespace StingyJunk.Analyzers.Test.Helpers
         /// <returns>A Document created from the source string</returns>
         protected static Document CreateDocument(string source, string language = LanguageNames.CSharp)
         {
-            return CreateProject(new[] { source }, language).Documents.First();
+            return CreateProject(new[] {source}, language).Documents.First();
         }
 
         /// <summary>
@@ -140,10 +141,10 @@ namespace StingyJunk.Analyzers.Test.Helpers
         /// <returns>A Project created out of the Documents created from the source strings</returns>
         private static Project CreateProject(string[] sources, string language = LanguageNames.CSharp)
         {
-            string fileNamePrefix = _DefaultFilePathPrefix;
-            string fileExt = language == LanguageNames.CSharp ? _CSharpDefaultFileExt : _VisualBasicDefaultExt;
+            var fileNamePrefix = _DefaultFilePathPrefix;
+            var fileExt = language == LanguageNames.CSharp ? _CSharpDefaultFileExt : _VisualBasicDefaultExt;
 
-            var projectId = ProjectId.CreateNewId(debugName: _TestProjectName);
+            var projectId = ProjectId.CreateNewId(_TestProjectName);
 
             var solution = new AdhocWorkspace()
                 .CurrentSolution
@@ -153,17 +154,17 @@ namespace StingyJunk.Analyzers.Test.Helpers
                 .AddMetadataReference(projectId, _cSharpSymbolsReference)
                 .AddMetadataReference(projectId, _codeAnalysisReference);
 
-            int count = 0;
+            var count = 0;
             foreach (var source in sources)
             {
                 var newFileName = fileNamePrefix + count + "." + fileExt;
-                var documentId = DocumentId.CreateNewId(projectId, debugName: newFileName);
+                var documentId = DocumentId.CreateNewId(projectId, newFileName);
                 solution = solution.AddDocument(documentId, newFileName, SourceText.From(source));
                 count++;
             }
             return solution.GetProject(projectId);
         }
+
         #endregion
     }
 }
-

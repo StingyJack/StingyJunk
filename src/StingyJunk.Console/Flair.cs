@@ -13,15 +13,12 @@
         public ConsoleColor ForegroundColor { get; }
         public ConsoleColor BackgroundColor { get; }
 
-        public static Flair Warning => _warningFlair;
-        public static Flair Success => _successFlair;
-        public static Flair Error => _errorFlair;
-        public static Flair Log => _logFlair;
+        public static Flair Warning { get; } = new Flair(ConsoleColor.Yellow, ConsoleColor.Black);
 
-        private static readonly Flair _warningFlair = new Flair(ConsoleColor.Yellow, ConsoleColor.Black);
-        private static readonly Flair _successFlair = new Flair(ConsoleColor.Green, ConsoleColor.Black);
-        private static readonly Flair _errorFlair = new Flair(ConsoleColor.Red, ConsoleColor.Black);
-        private static readonly Flair _logFlair = new Flair(ConsoleColor.Gray, ConsoleColor.Black);
+        public static Flair Success { get; } = new Flair(ConsoleColor.Green, ConsoleColor.Black);
 
+        public static Flair Error { get; } = new Flair(ConsoleColor.Red, ConsoleColor.Black);
+
+        public static Flair Log { get; } = new Flair(ConsoleColor.Gray, ConsoleColor.Black);
     }
 }

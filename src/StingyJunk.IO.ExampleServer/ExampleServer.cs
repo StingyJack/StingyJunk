@@ -1,7 +1,6 @@
 ﻿namespace StingyJunk.IO.ExampleServer
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using Console;
@@ -22,12 +21,13 @@
             Thread.CurrentThread.Name = nameof(ExampleServer);
 
             var headerArea = new DisplayArea(HEADER_AREA, 0, 0, HEADER_LINES - 1, Console.WindowWidth);
-            var totalConnectionArea = new DisplayArea(STATS_TOTAL_CONNECTION_AREA, headerArea.Bottom + 1, 0, headerArea.Bottom + 1, Console.WindowWidth) { Cycle = true };
-            var activeConnectionArea = new DisplayArea(STATS_ACTIVE_CONNECTION_AREA, totalConnectionArea.Bottom + 1, 0, totalConnectionArea.Bottom + 1, Console.WindowWidth) { Cycle = true };
-            var logAreaDemarcation = new DisplayArea(LOG_AREA_DEMARCATION, activeConnectionArea.Bottom + 1, 0, activeConnectionArea.Bottom + 1, Console.WindowWidth) { Cycle = true };
-            var logArea = new DisplayArea(LOG_AREA, logAreaDemarcation.Bottom + 1, 0, Console.WindowHeight - logAreaDemarcation.Bottom, Console.WindowWidth) { Cycle = true };
+            var totalConnectionArea = new DisplayArea(STATS_TOTAL_CONNECTION_AREA, headerArea.Bottom + 1, 0, headerArea.Bottom + 1, Console.WindowWidth) {Cycle = true};
+            var activeConnectionArea =
+                new DisplayArea(STATS_ACTIVE_CONNECTION_AREA, totalConnectionArea.Bottom + 1, 0, totalConnectionArea.Bottom + 1, Console.WindowWidth) {Cycle = true};
+            var logAreaDemarcation = new DisplayArea(LOG_AREA_DEMARCATION, activeConnectionArea.Bottom + 1, 0, activeConnectionArea.Bottom + 1, Console.WindowWidth) {Cycle = true};
+            var logArea = new DisplayArea(LOG_AREA, logAreaDemarcation.Bottom + 1, 0, Console.WindowHeight - logAreaDemarcation.Bottom, Console.WindowWidth) {Cycle = true};
 
-            _consoleWindow = new ConsoleWindow(new[] { headerArea, totalConnectionArea, activeConnectionArea, logAreaDemarcation, logArea });
+            _consoleWindow = new ConsoleWindow(new[] {headerArea, totalConnectionArea, activeConnectionArea, logAreaDemarcation, logArea});
 
             _consoleWindow.Clear();
             _consoleWindow.WriteLine($"Locating hosting information...", Flair.Log, HEADER_AREA);

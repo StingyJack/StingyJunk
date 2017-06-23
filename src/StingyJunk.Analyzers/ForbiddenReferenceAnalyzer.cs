@@ -53,7 +53,6 @@ namespace StingyJunk.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
-
             context.RegisterCompilationAction(
                 compilationContext =>
                 {
@@ -77,7 +76,6 @@ namespace StingyJunk.Analyzers
                                 var descr = string.Format(_messageFormat.ToString(), refAssem.Name);
                                 compilationContext.ReportDiagnostic(Diagnostic.Create(DIAGNOSTIC_ID, CATEGORY, descr, DiagnosticSeverity.Error,
                                     DiagnosticSeverity.Error, true, 0, _title, _description));
-
                             }
                         }
                     }

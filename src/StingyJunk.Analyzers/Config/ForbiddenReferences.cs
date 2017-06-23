@@ -13,7 +13,7 @@
 
         [DataMember]
         // ReSharper disable CollectionNeverUpdated.Global
-        public List<ForbiddenReference> References { get;  }
+        public List<ForbiddenReference> References { get; }
         // ReSharper restore CollectionNeverUpdated.Global
     }
 }

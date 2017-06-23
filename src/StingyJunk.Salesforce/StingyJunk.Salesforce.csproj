@@ -116,10 +116,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Attachment.cs" />
     <Compile Include="AttachmentField.cs" />
     <Compile Include="CaseMessageFormatter.cs" />
     <Compile Include="Consts.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Models\DescribedField.cs" />
     <Compile Include="Models\DescribedObject.cs" />

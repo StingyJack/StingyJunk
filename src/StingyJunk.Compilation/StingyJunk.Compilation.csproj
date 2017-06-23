@@ -167,7 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs">
-      <Link>SharedAssemblyInfo.cs</Link>
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Bags\AsmDetail.cs" />
     <Compile Include="Bags\CommonCompilationDetail.cs" />
@@ -178,6 +178,7 @@
     <Compile Include="Bags\ReferenceCollection.cs" />
     <Compile Include="Bags\RewrittenFile.cs" />
     <Compile Include="Bags\ScriptCompilationResult.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Misc\AttributeExtensions.cs" />
     <Compile Include="Misc\ConversionExtensions.cs" />
     <Compile Include="Misc\Enums.cs" />

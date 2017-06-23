@@ -209,6 +209,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="TfsConnectedBase.cs" />
     <Compile Include="TfsKnownElements.cs" />
     <Compile Include="TfsWorkitemController.cs" />
@@ -217,28 +220,12 @@
     <None Include="TfsConfiguration.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="CodeGen\TfsMetadataProvider.ttinclude" />
-    <Compile Include="CodeGen\AsmResolvableTtHost.cs" />
     <Compile Include="MetadataProvider.cs" />
     <Compile Include="MostLikelyProjectInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CodeGen\TfsWorkitemCodeGen.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>TfsWorkitemCodeGen.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="CodeGen\TfsWorkitemCodeGen.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>TfsWorkitemCodeGen.cs</LastGenOutput>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="CodeGen\CodeGenHelpers.ttinclude" />
-    <None Include="CodeGen\workitemfields.json" />
-    <None Include="CodeGen\workitemtypes.json" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<package >
+<?xml version="1.0" ?>
+<package>
   <metadata>
     <id>StingyJunk.IO</id>
     <version>1.0.2</version>
@@ -14,8 +14,8 @@
     <tags>IO Tcp File</tags>
   </metadata>
   <files>
-    <file src="bin\$configuration$\StingyJunk.IO.dll" target="lib\net462"/>
-    <file src="bin\$configuration$\StingyJunk.IO.pdb" target="lib\net462"/>
-    <file src="bin\$configuration$\Examples\*.*" target="content\Examples"/>
+    <file src="bin\$configuration$\StingyJunk.IO.dll" target="lib\net462" />
+    <file src="bin\$configuration$\StingyJunk.IO.pdb" target="lib\net462" />
+    <file src="bin\$configuration$\Examples\*.*" target="content\Examples" />
   </files>
 </package>

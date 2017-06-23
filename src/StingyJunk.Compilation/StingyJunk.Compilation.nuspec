@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<package >
+<?xml version="1.0" ?>
+<package>
   <metadata>
     <id>StingyJunk.Compilation</id>
     <version>1.0.1</version>
@@ -13,13 +13,13 @@
     <copyright>Copyright 2017</copyright>
     <tags>Roslyn Utilities CodeGen</tags>
     <dependencies>
-      <dependency id="Microsoft.CodeAnalysis" version="2.1.0"/>
-      <dependency id="Microsoft.CodeAnalysis.CSharp.Scripting" version="2.1.0"/>
-      <dependency id="Microsoft.CodeAnalysis.Scripting.Common" version="2.1.0"/>
+      <dependency id="Microsoft.CodeAnalysis" version="2.1.0" />
+      <dependency id="Microsoft.CodeAnalysis.CSharp.Scripting" version="2.1.0" />
+      <dependency id="Microsoft.CodeAnalysis.Scripting.Common" version="2.1.0" />
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\$configuration$\StingyJunk.Compilation.dll" target="lib\net462"/>
-    <file src="bin\$configuration$\StingyJunk.Compilation.pdb" target="lib\net462"/>
+    <file src="bin\$configuration$\StingyJunk.Compilation.dll" target="lib\net462" />
+    <file src="bin\$configuration$\StingyJunk.Compilation.pdb" target="lib\net462" />
   </files>
 </package>

@@ -1,5 +1,4 @@
-﻿// ReSharper disable ClassNeverInstantiated.Global
-namespace StingyJunk.Config
+﻿namespace StingyJunk.Config
 {
     /// <summary>
     ///      A System Instance
@@ -11,13 +10,12 @@ namespace StingyJunk.Config
         /// </summary>
         public SystemInstance()
         {
-            
         }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="SystemInstance" /> class.
         /// </summary>
-        /// <param name="instanceUrl">if set to <c>true</c> [automatic load instance meta data].</param>
+        /// <param name="autoLoadInstanceMetaData"></param>
         /// <param name="instanceUrl">The instance URL.</param>
         public SystemInstance(bool autoLoadInstanceMetaData, string instanceUrl)
         {

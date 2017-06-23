@@ -51,12 +51,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs">
-      <Link>SharedAssemblyInfo.cs</Link>
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Extensions\Lists.cs" />
     <Compile Include="Extensions\Objects.cs" />
     <Compile Include="Extensions\Serialization.cs" />
     <Compile Include="Extensions\Bools.cs" />
+    <Compile Include="Extensions\Streams.cs" />
     <Compile Include="Extensions\Strings.cs" />
     <Compile Include="Bases\LoggableBase.cs" />
     <Compile Include="Attributes\NotAvailableYetAttribute.cs" />

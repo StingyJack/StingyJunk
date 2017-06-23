@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using Models;
 
-    public class CaseMessageFormatter 
+    public class CaseMessageFormatter
     {
         public Message GetCaseMessage(Case sfCase)
         {
@@ -32,27 +32,27 @@
                             new AttachmentField
                             {
                                 Title = "Customer",
-                                Value = sfCase.Account.Name,
+                                Value = sfCase.Account.Name
                             },
                             new AttachmentField
                             {
                                 Title = "Case Open Date",
-                                Value = sfCase.CreatedDateShort,
+                                Value = sfCase.CreatedDateShort
                             },
                             new AttachmentField
                             {
                                 Title = "Subject",
-                                Value = sfCase.Subject,
+                                Value = sfCase.Subject
                             },
                             new AttachmentField
                             {
                                 Title = "Owner",
-                                Value = sfCase.OwnerId,
+                                Value = sfCase.OwnerId
                             },
                             new AttachmentField
                             {
                                 Title = $"Last Update: {sfCase.LastModifiedDateShort}",
-                                Value = "Need to find this field",
+                                Value = "Need to find this field"
                             }
                         }
                     },

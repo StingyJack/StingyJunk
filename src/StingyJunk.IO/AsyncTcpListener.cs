@@ -23,7 +23,9 @@
         public const int SUCCESS = 0;
         public const int ERROR = -1;
 
+        // ReSharper disable CollectionNeverQueried.Local
         private readonly List<TcpListener> _tcpListeners = new List<TcpListener>();
+        // ReSharper restore CollectionNeverQueried.Local
 
         /// <summary>
         ///     Giff naem for logging/diagnostic
@@ -144,18 +146,6 @@
                 Info("Stop requested, setting cancellation");
                 _cancellationTokenSource.Cancel();
             }
-
-            //foreach (var tl in _tcpListeners)
-            //{
-            //    try
-            //    {
-            //        tl?.Stop();
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        Error($"Failed to stop listener {tl?.LocalEndpoint}", e);
-            //    }
-            //}
         }
 
         #endregion //#region "control"
@@ -183,7 +173,7 @@
 #pragma warning restore 4014
             }
         }
-        
+
         private async Task ProcessAsync(TcpClient tcpClient, int clientId,
             CancellationToken ct)
         {
@@ -239,7 +229,7 @@
                 reader.Dispose();
                 writer.Dispose();
             }
-            
+
             Debug($"\t ClientId {clientId} disconnected");
         }
 

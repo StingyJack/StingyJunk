@@ -16,8 +16,9 @@
                    //+ " , [System.IterationPath] " 
                    + " FROM WorkItems "
                    + "WHERE [System.State] IN ('New','Approved','Committed', 'InProgress', 'ToDo') "
-                    + " AND [System.AssignedTo] != ''";
+                   + " AND [System.AssignedTo] != ''";
         }
+
         /*
             Select [System.WorkItemType]
                 ,[System.Title]

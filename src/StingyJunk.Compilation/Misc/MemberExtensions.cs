@@ -124,8 +124,8 @@
 
         public static MethodDeclarationSyntax AsReturnTask(this MethodDeclarationSyntax methodDeclarationSyntax)
         {
-            var newMethodReturnType = methodDeclarationSyntax.IsVoidReturnType() 
-                ? SyntaxFactory.ParseTypeName("Task") 
+            var newMethodReturnType = methodDeclarationSyntax.IsVoidReturnType()
+                ? SyntaxFactory.ParseTypeName("Task")
                 : SyntaxFactory.GenericName("Task").AddTypeArgumentListArguments(methodDeclarationSyntax.ReturnType.WithoutTrivia());
             return methodDeclarationSyntax.WithReturnType(newMethodReturnType);
         }

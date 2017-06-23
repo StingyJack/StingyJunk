@@ -1,7 +1,7 @@
 ﻿namespace StingyJunk.IO.ExampleClient
 {
-    using StingyJunk.Extensions;
     using System;
+    using Extensions;
 
     internal class OperationResult
     {
@@ -13,10 +13,10 @@
 
         public override string ToString()
         {
-            var state = (Ex != null && DataExchangeResult.Errors.Count == 0) ? "Success" : "ERROR";
+            var state = Ex != null && DataExchangeResult.Errors.Count == 0 ? "Success" : "ERROR";
             return $"{nameof(ClientId)} '{ClientId}' - {nameof(ElapsedMs)} {ElapsedMs} - {state}" +
-                $" - {nameof(RequestMessage)} '{RequestMessage}'" +
-                $" - {nameof(DataExchangeResult.ResponseMessage)} : {DataExchangeResult.ResponseMessage}";
+                   $" - {nameof(RequestMessage)} '{RequestMessage}'" +
+                   $" - {nameof(DataExchangeResult.ResponseMessage)} : {DataExchangeResult.ResponseMessage}";
         }
 
         public string WithErrors()

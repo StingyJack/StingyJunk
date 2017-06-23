@@ -11,28 +11,30 @@
     /// </summary>
     public class TfsKnownElements
     {
-
-
         /// <summary>
         ///     Gets the base URL.
         /// </summary>
         public string BaseUrl { get; }
+
         /// <summary>
         ///     Gets or sets the known project collection references.
         /// </summary>
         public Dictionary<string, TeamProjectCollectionReference> KnownProjectCollectionReferences { get; }
+
         /// <summary>
         ///     Gets or sets the known project collections.
         /// </summary>
-        public Dictionary<string, TeamProjectCollection> KnownProjectCollections { get;  }
+        public Dictionary<string, TeamProjectCollection> KnownProjectCollections { get; }
+
         /// <summary>
         ///     Gets or sets the known project references.
         /// </summary>
         public Dictionary<string, TeamProjectReference> KnownProjectReferences { get; }
+
         /// <summary>
         ///     Gets or sets the known project to collection map.
         /// </summary>
-        public Dictionary<string, string> KnownProjectToCollectionMap { get;  }
+        public Dictionary<string, string> KnownProjectToCollectionMap { get; }
 
         /// <summary>
         ///     Gets the is all present.

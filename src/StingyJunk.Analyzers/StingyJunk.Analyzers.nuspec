@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+﻿<?xml version="1.0" ?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>StingyJunk.Analyzers</id>
@@ -22,6 +22,6 @@
     <!--<file src="*.dll" target="analyzers" exclude="**\Microsoft.CodeAnalysis.*;**\System.Collections.Immutable.*;**\System.Reflection.Metadata.*;**\System.Composition.*" />-->
     <file src="*.dll" target="analyzers" exclude="**\Microsoft.CodeAnalysis.*;**\System.Reflection.Metadata.*;**\System.Composition.*" />
     <file src="tools\*.ps1" target="tools\" />
-    <file src="tools\ForbiddenReferences.xml" target="content\"  />
+    <file src="tools\ForbiddenReferences.xml" target="content\" />
   </files>
 </package>

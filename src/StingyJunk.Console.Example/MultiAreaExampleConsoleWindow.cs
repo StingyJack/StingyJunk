@@ -4,13 +4,14 @@
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
-    using StingyJunk.Extensions;
+    using Extensions;
 
     internal static class MultiAreaExampleConsoleWindow
     {
         private static ConsoleWindow _consoleWindow;
         private static LinkedList<Flair> _flairs;
         private static LinkedListNode<Flair> _lastFlair;
+
         private static void Main()
         {
             Thread.CurrentThread.Name = nameof(SimpleExampleConsoleWindow);
@@ -19,11 +20,10 @@
             var header = new DisplayArea("Header", 0, 0, 5, Console.WindowWidth);
 
             var scrollingMessages = new DisplayArea("Messages", header.Bottom + 1, 0,
-                Console.WindowHeight - (header.Bottom + 1), Console.WindowWidth);
-            scrollingMessages.Cycle = true;
+                Console.WindowHeight - (header.Bottom + 1), Console.WindowWidth) {Cycle = true};
 
 
-            _consoleWindow = new ConsoleWindow(new[] { header, scrollingMessages });
+            _consoleWindow = new ConsoleWindow(new[] {header, scrollingMessages});
             WriteHeader($"This is the head");
 
             Task.Run(() =>
@@ -50,7 +50,7 @@
 
         private static void WriteMessage(string msg)
         {
-            LinkedListNode<Flair> flair = null;
+            LinkedListNode<Flair> flair;
             if (_lastFlair == null)
             {
                 _lastFlair = _flairs.First;
@@ -61,7 +61,7 @@
                 flair = _lastFlair.NextOrFirst();
                 _lastFlair = flair;
             }
-            
+
 
             _consoleWindow.WriteLine(msg, flair.Value, "Messages");
         }
@@ -70,13 +70,13 @@
         {
             var flairs = new LinkedList<Flair>();
             foreach (ConsoleColor foregroundColor in Enum.GetValues(typeof(ConsoleColor)))
-            {   
+            {
                 var backgroundColor = ConsoleColor.Black;
                 if ((int) foregroundColor < 10)
                 {
                     backgroundColor = ConsoleColor.White;
                 }
-                
+
                 var flair = new Flair(foregroundColor, backgroundColor);
                 if (flairs.Count == 0)
                 {
@@ -84,12 +84,11 @@
                 }
                 else
                 {
-                    flairs.AddAfter(flairs.Last, flair);        
+                    flairs.AddAfter(flairs.Last, flair);
                 }
             }
-            
+
             return flairs;
         }
-
     }
 }

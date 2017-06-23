@@ -18,7 +18,7 @@
 
         public ConsoleWindow()
         {
-            AddDisplayAreasIn(new[] { DefaultArea });
+            AddDisplayAreasIn(new[] {DefaultArea});
             _queuedWriter = new QueuedWriter();
         }
 
@@ -97,20 +97,19 @@
             return writePosition;
         }
 
-        private int GetMessageLineCount(string message )
+        private int GetMessageLineCount(string message)
         {
             //  if the write occupies multiple lines, the next write has to be offset to account for that.
             //
             //  if the message was 225 chars (without explicit newlines) and the console width is 110,
             //  the message would have occupied 3 lines
-           
 
-            var explicitLines = message.Split(new[]{Environment.NewLine}, StringSplitOptions.None);
+
+            var explicitLines = message.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
             var lineCount = explicitLines.Length;
             foreach (var line in explicitLines)
             {
-                
-                lineCount += Convert.ToInt32(Math.Floor(line.Length / (decimal)ConsoleWidth()));
+                lineCount += Convert.ToInt32(Math.Floor(line.Length / (decimal) ConsoleWidth()));
             }
             return lineCount;
         }
@@ -140,7 +139,7 @@
         }
 
 
-        private void Dwl(string message, [CallerMemberName]string methodName = null)
+        private void Dwl(string message, [CallerMemberName] string methodName = null)
         {
             Debug.WriteLine($"{nameof(ConsoleWindow)}.{methodName} - {DateTime.Now.TimeOfDay} - {message} ");
         }

@@ -12,6 +12,7 @@
     {
         [DataMember]
         public string NameMatch { get; }
+
         [DataMember]
         public string VersionGreaterThan { get; }
 
@@ -30,7 +31,7 @@
                 if (_version != null) { return _version; }
                 if (Version.TryParse(VersionGreaterThan, out _version) == false)
                 {
-                    throw new ArgumentException($"cant parse version {VersionGreaterThan} for comparison");    
+                    throw new ArgumentException($"cant parse version {VersionGreaterThan} for comparison");
                 }
                 return _version;
             }
@@ -69,7 +70,7 @@
              *                      candidate is null.
              */
             var result = ParsedVersion.CompareTo(candidate.Version);
-            
+
             if (result > 0)
             {
                 return true;

@@ -1,7 +1,7 @@
-﻿using System.Text;
-
-namespace StingyJunk.Extensions
+﻿namespace StingyJunk.Extensions
 {
+    using System.Text;
+
     public static class Objects
     {
         public static string GetCommaSepListOfPropNames(this object instance)

@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!--This is an example of how to denote forbidden references-->
 <ForbiddenReferences>
-  
+
   <ForbiddenReference>
     <!--This will exclude assemblies with the string "Something.SomeAssembly" anywhere in the name-->
     <NameMatch>(\w*)Something.SomeAssembly(\w*)</NameMatch>
   </ForbiddenReference>
-  
+
   <!--This will exclude assemblies starting with the name "Something.SomeAssembly" that have versions higher then 1.6.5-->
   <ForbiddenReference>
     <NameMatch>Something.SomeAssembly(\w*)</NameMatch>

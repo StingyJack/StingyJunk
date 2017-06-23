@@ -1,7 +1,5 @@
 namespace StingyJunk.Console
 {
-    using System;
-
     internal class ConsoleMessage
     {
         /// <summary>

@@ -2,7 +2,6 @@
 {
     public class SalesForceSettings
     {
-
         public string SecurityToken { get; set; }
 
         public string ConsumerKey { get; set; }
@@ -30,6 +29,5 @@
                 return false;
             }
         }
-
     }
 }

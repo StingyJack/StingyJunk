@@ -12,7 +12,7 @@ namespace StingyJunk.Console
     {
         private bool _acceptNewItems;
         private bool _keepWriting;
-        private bool _terminationRequested ;
+        private bool _terminationRequested;
         private Thread _queueDrainer;
         private readonly object _groupLock = new object();
         private readonly ConcurrentQueue<ConsoleMessage> _queuedMessages = new ConcurrentQueue<ConsoleMessage>();
@@ -114,16 +114,16 @@ namespace StingyJunk.Console
                 Dwl($"{nameof(msgToWrite)} ({msgToWrite.Length}), console window width {width}. console buffer width {Console.BufferWidth}");
                 if (msgToWrite.Length < width)
                 {
-                    var padding = new string(' ', width -1 - cm.Message.Length);
+                    var padding = new string(' ', width - 1 - cm.Message.Length);
                     var whitespaceCleanedMessage = $"{cm.Message}{padding}";
-                    Dwl($"{nameof(msgToWrite)} ({msgToWrite.Length}) is less than the console window width ({width}), padding with {padding.Length} spaces to be {whitespaceCleanedMessage.Length}");
-                    
-                    msgToWrite = whitespaceCleanedMessage;
+                    Dwl(
+                        $"{nameof(msgToWrite)} ({msgToWrite.Length}) is less than the console window width ({width}), padding with {padding.Length} spaces to be {whitespaceCleanedMessage.Length}");
 
+                    msgToWrite = whitespaceCleanedMessage;
                 }
 
                 Dwl($"{cm.WritePosition} : '{msgToWrite}'");
-                
+
                 Console.WriteLine(msgToWrite);
             }
         }
@@ -138,6 +138,5 @@ namespace StingyJunk.Console
         {
             Debug.WriteLine($"{nameof(QueuedWriter)} - {DateTime.Now.TimeOfDay} - {message} ");
         }
-
     }
 }

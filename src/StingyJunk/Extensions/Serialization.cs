@@ -27,7 +27,7 @@
         public static T CloneByJson<T>(this T instance) where T : class
         {
             var json = JsonConvert.SerializeObject(instance);
-            var newInstance = JsonConvert.DeserializeObject(json,typeof(T));
+            var newInstance = JsonConvert.DeserializeObject(json, typeof(T));
             return newInstance as T;
         }
     }

@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-
 [assembly: AssemblyCompany("Andrew Stanton")]
 [assembly: AssemblyProduct("StingyJunk")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]

@@ -14,7 +14,7 @@
 
             // this is the test server endpoint
             var serverUrl = "http://testas2.mendelson-e-c.com:8080/as2/HttpReceiver";
-            
+
             var as2Client = new As2Client(serverUrl);
             var fileName = "sample.edi";
             var data = File.OpenRead(fileName);

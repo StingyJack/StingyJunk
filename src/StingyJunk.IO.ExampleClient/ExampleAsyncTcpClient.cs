@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -9,7 +10,6 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Console;
-    using System.Collections.Generic;
 
     public static class ExampleAsyncTcpClient
     {
@@ -19,7 +19,7 @@
         private const string HEADER_AREA = "HeaderArea";
         private const string LOG_AREA_DEMARCATION = "LogAreaDemarcation";
         private const string LOG_AREA = "LogArea";
-        private static List<Task> _clientTasks = new List<Task>();
+        private static readonly List<Task> _clientTasks = new List<Task>();
 
         public static void Run()
         {
@@ -27,13 +27,13 @@
             //  Pausing this so server can start first when debugging this and server at the same time.
             Thread.Sleep(1 * 1000);
             var headerArea = new DisplayArea(HEADER_AREA, 0, 0, 7, Console.WindowWidth);
-            var logAreaDemarcation = new DisplayArea(LOG_AREA_DEMARCATION, headerArea.Bottom + 1, 0, headerArea.Bottom + 1, Console.WindowWidth) { Cycle = true };
+            var logAreaDemarcation = new DisplayArea(LOG_AREA_DEMARCATION, headerArea.Bottom + 1, 0, headerArea.Bottom + 1, Console.WindowWidth) {Cycle = true};
             var logArea = new DisplayArea(LOG_AREA, logAreaDemarcation.Bottom + 1, 0, Console.WindowHeight - (logAreaDemarcation.Bottom + 1), Console.WindowWidth)
             {
                 Cycle = true
             };
 
-            _consoleWindow = new ConsoleWindow(new[] { headerArea, logAreaDemarcation, logArea });
+            _consoleWindow = new ConsoleWindow(new[] {headerArea, logAreaDemarcation, logArea});
             _consoleWindow.Clear();
 
             // ~16k is where the amount of completed connections in TIME_WAIT 
@@ -49,7 +49,7 @@
 
             var overallSw = Stopwatch.StartNew();
 
-            Parallel.For(0, RUN_COUNT, new ParallelOptions { MaxDegreeOfParallelism = MAXDOP }, async i =>
+            Parallel.For(0, RUN_COUNT, new ParallelOptions {MaxDegreeOfParallelism = MAXDOP}, async i =>
             {
                 _clientTasks.Add(ExecuteDataExchange(i));
                 var result = await ExecuteDataExchange(i);
@@ -61,7 +61,7 @@
             Task.WaitAll(_clientTasks.ToArray()); //let any further console updates post before adding summary
 
             _consoleWindow.WriteLine($"Ran {RUN_COUNT} records in {overallSw.ElapsedMilliseconds}ms with MAXDOP of {MAXDOP}", Flair.Success, HEADER_AREA);
-            var errors = _results.Where(r => r.Ex != null || r?.DataExchangeResult?.Errors.Count > 0).ToArray();
+            var errors = _results.Where(r => r.Ex != null || r.DataExchangeResult?.Errors.Count > 0).ToArray();
             if (errors.Any())
             {
                 _consoleWindow.WriteLine($"There were {errors.Length} errors", Flair.Error, HEADER_AREA);
@@ -72,14 +72,14 @@
                 }
             }
 
-            var rate = overallSw.ElapsedMilliseconds / (decimal)RUN_COUNT;
+            var rate = overallSw.ElapsedMilliseconds / (decimal) RUN_COUNT;
             _consoleWindow.WriteLine($"Overall rate of {rate}ms per record", Flair.Success, HEADER_AREA);
 
             var sumResultTimes = _results.Sum(r => r.ElapsedMs);
             _consoleWindow.WriteLine($"Per item total time of {sumResultTimes}ms", Flair.Success, HEADER_AREA);
 
             //inner item rate should be larger than overall rate, as there are many items running at once.
-            var innerItemRate = sumResultTimes / (decimal)RUN_COUNT;
+            var innerItemRate = sumResultTimes / (decimal) RUN_COUNT;
             _consoleWindow.WriteLine($"Per item rate of {innerItemRate}ms per record", Flair.Success, HEADER_AREA);
 
             if (_results.Count != RUN_COUNT)
@@ -113,10 +113,12 @@
 
         private static async Task<OperationResult> ExecuteDataExchange(int i)
         {
-            var result = new OperationResult { ClientId = i };
+            var result = new OperationResult {ClientId = i};
             result.RequestMessage = $"{TRIGGER_TEXT} Clientside ident {result.ClientId}. OK?";
             if (i % 3 == 0)
-            { result.RequestMessage = "NO"; }
+            {
+                result.RequestMessage = "NO";
+            }
             try
             {
                 var perItemSw = Stopwatch.StartNew();
@@ -144,7 +146,7 @@
             dexResult.Log.Add($"\t {clientId} - Getting Stream...");
 
             var stream = tc.GetStream();
-            var writer = new StreamWriter(stream) { AutoFlush = true };
+            var writer = new StreamWriter(stream) {AutoFlush = true};
             var reader = new StreamReader(stream);
 
             dexResult.Log.Add($"\t {clientId} - sending {message}");

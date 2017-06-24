@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solutio
 		..\LICENSE = ..\LICENSE
 		nuget.config = nuget.config
 		..\README.md = ..\README.md
+		SharedAssemblyInfo.cs = SharedAssemblyInfo.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Vs Plugins", "Vs Plugins", "{E5583D20-43DA-4E54-87F7-285D96B0D65C}"

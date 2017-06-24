@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solutio
 		build.ps1 = build.ps1
 		global.json = global.json
 		LICENSE = LICENSE
-		.nuget\nuget.config = .nuget\nuget.config
+		nuget.config = nuget.config
 		README.md = README.md
 	EndProjectSection
 EndProject

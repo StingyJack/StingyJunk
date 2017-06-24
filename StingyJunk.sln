@@ -22,8 +22,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StingyJunk", "src\StingyJun
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StingyJunk.CodeGen", "src\StingyJunk.CodeGen\StingyJunk.CodeGen.csproj", "{97C0A748-F4F6-44E0-89FA-AD10D38C9C06}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StingyJunk.Compilation", "src\StingyJunk.Compilation\StingyJunk.Compilation.csproj", "{76394E8A-3192-4E68-9B9D-BA585ECC19C0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StingyJunk.Console", "src\StingyJunk.Console\StingyJunk.Console.csproj", "{C5CD84F4-C154-46E7-97EE-FE5BA5FFAFB7}"
 EndProject
 Global
@@ -45,12 +43,6 @@ Global
 		{97C0A748-F4F6-44E0-89FA-AD10D38C9C06}.RegenCodeFiles|Any CPU.Build.0 = Release|Any CPU
 		{97C0A748-F4F6-44E0-89FA-AD10D38C9C06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97C0A748-F4F6-44E0-89FA-AD10D38C9C06}.Release|Any CPU.Build.0 = Release|Any CPU
-		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.RegenCodeFiles|Any CPU.ActiveCfg = Release|Any CPU
-		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.RegenCodeFiles|Any CPU.Build.0 = Release|Any CPU
-		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{76394E8A-3192-4E68-9B9D-BA585ECC19C0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C5CD84F4-C154-46E7-97EE-FE5BA5FFAFB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C5CD84F4-C154-46E7-97EE-FE5BA5FFAFB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5CD84F4-C154-46E7-97EE-FE5BA5FFAFB7}.RegenCodeFiles|Any CPU.ActiveCfg = Release|Any CPU

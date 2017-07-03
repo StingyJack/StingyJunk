@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<package>
+  <metadata>
+    <id>StingyJunk.Console</id>
+    <version>1.0.3</version>
+    <title>StingyJunk.Console</title>
+    <authors>Andrew Stanton</authors>
+    <owners>Andrew Stanton</owners>
+    <projectUrl>https://github.com/StingyJack/StingyJunk</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Console application display and navigation helpers. </description>
+    <releaseNotes>There are no release notes</releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>Console</tags>
+  </metadata>
+  <files>
+    <file src="bin\$configuration$\StingyJunk.Console.dll" target="lib\net462" />
+    <file src="bin\$configuration$\StingyJunk.Console.pdb" target="lib\net462" />
+    
+  </files>
+</package>

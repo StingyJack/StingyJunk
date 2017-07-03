@@ -9,7 +9,7 @@ $sjCsProjFilePath = "$sjCompPath\StingyJunk.Compilation.csproj"
 $sjCompNuspec = "$sjCompPath\StingyJunk.Compilation.nuspec"
 
 $nugetTarget = $sjCompNuspec
-$nugetTargets = @("StingyJunk.Compilation", "StingyJunk.IO")
+$nugetTargets = @("StingyJunk.Compilation", "StingyJunk.IO", "StingyJunk.Console")
 
 if ((Test-Path $nugetOutFolder) -eq $false)
 {
@@ -49,13 +49,14 @@ foreach ($nugetTarget in $nugetTargets)
 
 	Write-Host "Using nuspec path $nuspecPath"
 
-	.\.nuget\nuget.exe pack $nuspecPath `
+	nuget.exe pack $nuspecPath `
 		-Properties "Configuration=Release;Platform=`"Any CPU`""   `
 		-BasePath $projectFolder  `
 		-OutputDirectory $nugetOutFolder `
+		-Symbols `
 		-Verbosity Detailed `
-		-MSBuildPath "E:\vs2017.2\MSBuild\15.0\Bin\" `
-		-Symbols
+		#-MSBuildPath "E:\vs2017.2\MSBuild\15.0\Bin\" `
+		
 
 
 }

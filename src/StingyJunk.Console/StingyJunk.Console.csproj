@@ -50,6 +50,7 @@
     <Compile Include="ConsoleWindow.DisplayAreas.cs" />
     <None Include="FodyWeavers.xml" />
     <None Include="packages.config" />
+    <None Include="StingyJunk.Console.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StingyJunk\StingyJunk.csproj">
@@ -58,10 +59,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="NullGuard, Version=1.5.2.0, Culture=neutral, PublicKeyToken=1958ac8092168428, processorArchitecture=MSIL">
-      <HintPath>..\Packages\NullGuard.Fody.1.5.2\Lib\dotnet\NullGuard.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\Packages\System.Collections.Immutable.1.3.1\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
@@ -69,11 +66,4 @@
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\Packages\Fody.2.0.7\build\netstandard1.4\Fody.targets" Condition="Exists('..\Packages\Fody.2.0.7\build\netstandard1.4\Fody.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\Packages\Fody.2.0.7\build\netstandard1.4\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\Packages\Fody.2.0.7\build\netstandard1.4\Fody.targets'))" />
-  </Target>
 </Project>

@@ -247,7 +247,7 @@ public static void Main()
                 .WithAssemblyIdentityComparer(DesktopAssemblyIdentityComparer.Default);
 
             var compilation = CSharpCompilation.Create(detailsToUseForTarget.AsmName,
-                compilationSources.ToArray(), commonDetails.MetadataReferences);
+                compilationSources.ToArray(), commonDetails.MetadataReferences).WithOptions(options);
 
             return new PreparedCompilation
             {

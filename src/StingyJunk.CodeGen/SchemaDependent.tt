@@ -1,0 +1,310 @@
+﻿<#@ template debug="true" hostspecific="false" language="C#" #>
+<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="System.Xml.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#	
+
+	var m_connStrs = new List<string>();
+	m_connStrs.Add("Your connection string here");
+	
+	string m_columnQuery = @"SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS ORDER BY TABLE_NAME, ORDINAL_POSITION";
+	string m_tableQuery = @"SELECT DISTINCT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES ORDER BY TABLE_NAME";
+
+	SortedDictionary<string, TableData> _allData = new SortedDictionary<string, TableData>();
+	SortedDictionary<string, string> _columns = new SortedDictionary<string, string>();
+	SortedDictionary<string, string> _tables = new SortedDictionary<string, string>();
+
+	foreach (string _connStr in m_connStrs)
+	{
+
+		using (SqlConnection _conn = new SqlConnection(_connStr))
+		{
+
+			SqlCommand _cmd = new SqlCommand(m_columnQuery, _conn);
+			_conn.Open();
+			SqlDataReader _rdr = _cmd.ExecuteReader();
+			while (_rdr.Read())
+			{
+				string _columnName = Convert.ToString(_rdr["COLUMN_NAME"]);
+
+				if (_columnName.StartsWith("RMGT_"))
+				{
+					continue;
+				}
+
+				string _tableName = Convert.ToString(_rdr["TABLE_NAME"]);
+				string _dataType = Convert.ToString(_rdr["DATA_TYPE"]);
+
+				TableData _td;
+
+				if (_allData.ContainsKey(_tableName) == false)
+				{
+					_td = new TableData();
+					_td.TableActualName = _tableName;
+					_td.TableIdentifierName = MakeIdentifierSafeName(_tableName);
+					_allData.Add(_tableName, _td);
+				}
+				else
+				{
+					_td = _allData[_tableName];
+				}
+
+				string _derivedColumnDataType;
+
+				//taken from http://msdn.microsoft.com/en-us/library/cc716729.aspx
+				switch (_dataType)
+				{
+					case "varchar":
+						_derivedColumnDataType = "typeof(string)";
+						break;
+					case "nvarchar":
+						_derivedColumnDataType = "typeof(string)";
+						break;
+					case "char":
+						_derivedColumnDataType = "typeof(string)";
+						break;
+					case "nchar":
+						_derivedColumnDataType = "typeof(string)";
+						break;
+					case "text":
+						_derivedColumnDataType = "typeof(string)";
+						break;
+					case "tinyint":
+						_derivedColumnDataType = "typeof(Byte)";
+						break;
+					case "int":
+						_derivedColumnDataType = "typeof(int)";
+						break;
+					case "bigint":
+						_derivedColumnDataType = "typeof(Int64)";
+						break;
+					case "datetime2":
+					case "datetime":
+						_derivedColumnDataType = "typeof(DateTime)";
+						break;
+					case "smalldatetime":
+						_derivedColumnDataType = "typeof(DateTime)";
+						break;
+					case "bit":
+						_derivedColumnDataType = "typeof(bool)";
+						break;
+					case "numeric":
+						_derivedColumnDataType = "typeof(Decimal)";
+						break;
+					case "decimal":
+						_derivedColumnDataType = "typeof(Decimal)";
+						break;
+					case "uniqueidentifier":
+						_derivedColumnDataType = "typeof(Guid)";
+						break;
+					case "varbinary":
+						_derivedColumnDataType = "typeof(Byte[])";
+						break;
+					case "xml":
+						_derivedColumnDataType = "typeof(string)";
+						break;
+					case "time":
+						_derivedColumnDataType = "typeof(TimeSpan)";
+						break;
+					default:
+						_derivedColumnDataType = "UNKNOWN";
+						break;
+				}
+
+				ColumnData _cd = new ColumnData();
+				_cd.ColumnActualName = _columnName;
+				_cd.ColumnIdentifierName = MakeIdentifierSafeName(_columnName);
+				_cd.ColumnActualDataType = _dataType;
+				_cd.ColumnDotNetDataType = _derivedColumnDataType;
+
+				if ((from _c in _td.Columns where _c.ColumnActualName.Equals(_columnName) select _c).Count() == 0)
+				{
+					_td.Columns.Add(_cd);
+				}
+
+				if (_columns.ContainsKey(_cd.ColumnIdentifierName) == true)
+				{
+					continue;
+				}
+
+				_columns.Add(_cd.ColumnIdentifierName, _columnName);
+
+			} //end while
+			_rdr.Close();
+
+		} //end using 
+
+		using (SqlConnection _conn = new SqlConnection(_connStr))
+		{
+
+			SqlCommand _cmd = new SqlCommand(m_tableQuery, _conn);
+			_conn.Open();
+			SqlDataReader _rdr = _cmd.ExecuteReader();
+			while (_rdr.Read())
+			{
+				string _tableName = Convert.ToString(_rdr["TABLE_NAME"]);
+				string _identifierName = MakeIdentifierSafeName(_tableName);
+							
+				if (_tables.ContainsKey(_identifierName) == true)
+				{
+					continue;
+				}
+
+				_tables.Add(_identifierName, _tableName);
+
+			} //end while
+			_rdr.Close();
+
+		} //end using 
+
+	}
+#>
+
+//
+// Contains the complete list of generated types (fields, tables, constants, etc) across
+// all of the connections defined, as well as functionality to rebuild those schemas
+//
+//
+// <#= DateTime.Now.ToShortDateString() #> <#= Environment.UserName.ToUpper() #> - Regenerated content
+//
+namespace ChangeMeNamespace
+{
+	using System;
+	using System.Data;
+	using System.Diagnostics.CodeAnalysis;
+		
+	///<summary>
+	/// Contains the complete list of auto generated database fields
+	///</summary>
+	[ExcludeFromCodeCoverage]
+	public static partial class SchemaBuilder
+	{
+	
+		public static DataTable BuildSchema(string tableName)
+		{
+
+			if (String.IsNullOrWhiteSpace(tableName))
+            {
+                throw new ArgumentException("Schema cannot be built for a null or empty table name");
+            }
+
+			var dt = new DataTable(tableName);
+
+			switch (tableName)
+			{
+				<#
+				foreach (TableData _td in _allData.Values)
+				{#>case @"<#=_td.TableActualName#>":
+					dt = BuildSchemaFor<#=_td.TableActualName#>();
+					break;
+				<#
+				}
+				#>
+			
+			}
+
+			return dt;
+		}
+
+		<# 
+		foreach (TableData _td in _allData.Values)
+		{
+		#>private static DataTable BuildSchemaFor<#=_td.TableActualName#>()
+		{
+			var returnValue = new DataTable(@"<#=_td.TableActualName#>");
+
+			<#
+			foreach (ColumnData _cd in _td.Columns)
+			{
+			#>returnValue.Columns.Add(@"<#=_cd.ColumnActualName#>", <#=_cd.ColumnDotNetDataType#>);
+			<#
+			}
+			#>
+			
+			return returnValue;
+		}
+
+		<#
+
+		}
+		#>
+	}
+
+	///<summary>
+	/// Contains the complete list of auto generated database fields
+	///</summary>
+	public static partial class Fields
+	{
+	<#
+		foreach(KeyValuePair<string, string> _col in _columns)
+		{
+	#>	public static readonly string <#=_col.Key#> = @"<#=_col.Value#>";
+	<#
+		}	
+	#>}
+
+	///<summary>
+	/// Contains the complete list of auto generated table names
+	///</summary>
+	public static partial class Tables
+	{
+	<#
+		foreach(KeyValuePair<string, string> _table in _tables)
+		{
+	#>	public static readonly string <#=_table.Key#> = @"<#=_table.Value#>";
+	<#
+		}	
+	#>}
+
+		
+}
+
+<#+
+	private string MakeIdentifierSafeName(string str )
+	{
+
+		string _strippedUnderscore = str.Replace("_", " ");
+
+		return Regex.Replace( 
+			Regex.Replace( 
+				_strippedUnderscore, 
+				@"(\P{Ll})(\P{Ll}\p{Ll})", 
+				"$1 $2" 
+			), 
+			@"(\p{Ll})(\P{Ll})", 
+			"$1 $2" 
+		).ToUpper().Replace("  ", "_").Replace(" ", "_").Replace("__", "_");
+	}
+
+
+	class TableData
+	{
+		public TableData()
+		{
+			this.Columns = new List<ColumnData>(8);
+		}
+
+		public string TableActualName {get;set;}
+		public string TableIdentifierName {get;set;}
+		public List<ColumnData> Columns {get;set;}
+
+	}
+
+	class ColumnData
+	{
+		public string ColumnActualName {get;set;}
+		public string ColumnIdentifierName {get;set;}
+		public string ColumnActualDataType {get;set;}
+		public string ColumnDotNetDataType {get;set;}
+	}
+
+#>

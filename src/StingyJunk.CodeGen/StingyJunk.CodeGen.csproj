@@ -42,6 +42,22 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CodeGenHelpers.ttinclude" />
+    <None Include="GenerationHelpers.ttinclude" />
+    <None Include="StackBuilder.DataLayer.ttinclude" />
+    <None Include="StackBuilderTypesAndFunctions.ttinclude" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DataDependent.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DataDependent.cs</LastGenOutput>
+    </Content>
+    <Content Include="SchemaDependent.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SchemaDependent.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,0 +1,91 @@
+﻿<#@ template debug="true" hostspecific="false" language="C#" #>
+<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="System.Xml.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#	
+	var m_connStrs = new List<string>();
+	m_connStrs.Add("Your connection string here");
+	
+	string m_procQuery = @"SELECT DISTINCT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = 'PROCEDURE' ORDER BY ROUTINE_NAME";
+
+	SortedDictionary<string, string> _procs = new SortedDictionary<string, string>();
+
+	foreach (string _connStr in m_connStrs)
+	{
+		using (SqlConnection _conn = new SqlConnection(_connStr))
+		{
+
+			SqlCommand _cmd = new SqlCommand(m_procQuery, _conn);
+			_conn.Open();
+			SqlDataReader _rdr = _cmd.ExecuteReader();
+			while (_rdr.Read())
+			{
+				string _procName = Convert.ToString(_rdr["ROUTINE_NAME"]);
+				string _identifierName = MakeIdentifierSafeName(_procName);
+			
+				if (_procs.ContainsKey(_identifierName) == true)
+				{
+					continue;
+				}
+
+				_procs.Add(_identifierName, _procName);
+
+			} //end while
+			_rdr.Close();
+
+		} //end using 
+
+
+	}
+#>
+//
+// Contains the stored procedure 
+//
+//
+// <#= DateTime.Now.ToShortDateString() #> <#= Environment.UserName.ToUpper() #> - Regenerated content
+//
+namespace ChangeMeNamespace
+{
+	
+	///<summary>
+	/// Contains the complete list of auto generated stored procedure names
+	///</summary>
+	public static partial class StoredProcs
+	{
+	<#
+		foreach(KeyValuePair<string, string> _proc in _procs)
+		{
+	#>	public static readonly string <#=_proc.Key#> = @"<#=_proc.Value#>";
+	<#
+		}	
+	#>}
+
+}
+
+<#+
+	private string MakeIdentifierSafeName(string str )
+	{
+
+		string _strippedUnderscore = str.Replace("_", " ");
+
+		return Regex.Replace( 
+			Regex.Replace( 
+				_strippedUnderscore, 
+				@"(\P{Ll})(\P{Ll}\p{Ll})", 
+				"$1 $2" 
+			), 
+			@"(\p{Ll})(\P{Ll})", 
+			"$1 $2" 
+		).ToUpper().Replace("  ", "_").Replace(" ", "_").Replace("__", "_");
+	}
+
+#>

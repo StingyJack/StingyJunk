@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>StingyJunk.Compilation</id>
-    <version>1.0.1</version>
+    <version>$version$</version>
     <title>Code writers and rewriters</title>
     <authors>Andrew Stanton</authors>
     <owners>Andrew Stanton</owners>
@@ -10,7 +10,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Roslyn and other compilation helpers</description>
     <releaseNotes>There are no release notes</releaseNotes>
-    <copyright>Copyright 2017</copyright>
+    <developmentDependency>true</developmentDependency>
+    <copyright>Copyright 2019</copyright>
     <tags>Roslyn Utilities CodeGen</tags>
     <dependencies>
       <dependency id="Microsoft.CodeAnalysis" version="2.1.0" />

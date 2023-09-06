@@ -1,0 +1,216 @@
+﻿<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+<#+
+
+	private class TableGen
+	{
+
+		public string TableName {get;set;}
+		public string NamespaceName {get;set;}
+		public string ClassName {get;set;}
+		public bool Serializable {get;set;}
+		public bool SuppressDefaultCtor {get;set;}
+		public TableGen(string tableName, string namespaceName, string className,bool serializable, bool suppressDefaultCtor)
+		{
+			this.TableName = tableName;
+			this.NamespaceName= namespaceName;
+			this.ClassName = className;
+			this.Serializable = serializable;
+			this.SuppressDefaultCtor = suppressDefaultCtor;
+		}
+
+	}
+
+	private class TableData
+	{
+
+		public TableGen TableGenData {get;set;}
+		public List<ColumnData> Columns;
+
+		public TableData(TableGen tableData)
+		{
+			this.TableGenData = tableData;
+			this.Columns = new List<ColumnData>(8);
+		}
+
+	}
+
+	private class ColumnData
+	{
+
+		public string ColumnName {get;set;}
+		public string PropertyName {get;set;}
+		public string DataType {get;set;}
+		public bool IsNullable {get;set;}
+
+	}
+
+	private string DeriveTypeName(string sqlDataType)
+	{
+		string returnValue;
+
+		switch (sqlDataType)
+		{
+			case "varchar":
+				returnValue = "string";
+				break;
+
+			case "nvarchar":
+				returnValue = "string";
+				break;
+		
+			case "int":
+				returnValue = "int";
+				break;
+			
+			case "datetime":
+				returnValue = "DateTime";
+				break;
+
+			case "datetime2":
+				returnValue = "DateTime";
+				break;
+
+			case "bigint":
+				returnValue = "long";
+				break;
+
+			case "varbinary":
+				returnValue = "byte[]";
+				break;
+
+			case "bit":
+				returnValue = "bool";
+				break;
+			
+			case "decimal":
+				returnValue = "decimal";
+				break;
+
+			case "uniqueidentifier":
+				returnValue = "Guid";
+				break;
+			case "time":
+				returnValue = "TimeSpan";
+				break;
+
+			default:
+				returnValue = "string";
+				break;
+		}
+
+		return returnValue;
+	}
+
+	private string DeriveConvertToName(string netDataType)
+	{
+		string returnValue;
+
+		switch (netDataType)
+		{
+			case "string":
+				returnValue = "Convert.ToString(";
+				break;
+		
+			case "int":
+				returnValue = "Convert.ToInt32(";
+				break;
+
+			case "long":
+				returnValue = "Convert.ToInt64(";
+				break;
+			
+			case "DateTime":
+				returnValue = "Convert.ToDateTime(";
+				break;
+
+			case "byte[]":
+				returnValue = "(byte[])(";
+				break;
+
+			case "bool":
+				returnValue = "Convert.ToBoolean(";
+				break;
+
+			case "decimal":
+				returnValue = "Convert.ToDecimal(";
+				break;
+			
+			case "Guid":
+				returnValue = "((Guid)";
+				break;
+			
+			case "TimeSpan":
+				returnValue = "CodeGenUtils.ConvertToTimeSpan(";
+				break;
+			
+			default:
+				returnValue = "Convert.ToString(";
+				break;
+		}
+
+		return returnValue;
+	}
+
+	private string MakeIdentifierSafeName(string str )
+	{
+
+		string _strippedUnderscore = str.Replace("_", "");
+
+		return Regex.Replace( 
+			Regex.Replace( 
+				_strippedUnderscore, 
+				@"(\P{Ll})(\P{Ll}\p{Ll})", 
+				"$1 $2" 
+			), 
+			@"(\p{Ll})(\P{Ll})", 
+			"$1 $2" 
+		).Replace("  ", "").Replace(" ", "");
+	}
+
+	private string LcaseFirstChar(string value)
+	{
+		if (String.IsNullOrWhiteSpace(value))
+		{
+			return String.Empty;
+		}
+
+		if (value.Length == 1)
+		{
+			return value.ToLower();
+		}
+		
+		return value.Substring(0,1).ToLower() + value.Substring(1);
+
+	}
+
+	private string patchKeyword(string value)
+	{
+		string output = value;
+		if(value == "operator")
+		{
+			output = value + "ID";
+		}
+		return output;
+	}
+
+	private string GenerateParamList(List<ColumnData> columns)
+	{
+		StringBuilder _paramList = new StringBuilder();
+
+		foreach (ColumnData _cd in columns)
+		{
+			_paramList.AppendFormat("{0}{2} {1}, ", _cd.DataType, patchKeyword(LcaseFirstChar(_cd.PropertyName)), 
+				((_cd.DataType != "string" && _cd.DataType != "byte[]") && _cd.IsNullable == true) ? "?":"");
+		}
+
+		string _returnValue = _paramList.ToString().Trim();
+		
+		return _returnValue.Remove(_returnValue.Length - 1, 1);
+	}
+
+#>

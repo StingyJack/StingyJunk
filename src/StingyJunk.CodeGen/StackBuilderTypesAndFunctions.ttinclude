@@ -1,0 +1,360 @@
+﻿<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="System.Xml.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#+
+
+	public class Stack
+	{
+		public Stack(){}
+		
+		public Stack(XElement ele)
+		{
+			
+			TableName = ele.Attributes("tableName").First().Value;			
+			EntityName = ele.Attributes("entityName").First().Value;
+			GetProc = ele.Attributes("getProc").First().Value;
+			SaveProc = ele.Attributes("saveProc").First().Value;
+			ServiceClassName = ele.Attributes("serviceClassName").First().Value;
+			UnitTestClassName = ele.Attributes("unitTestClassName").First().Value;
+			DataClassInterface = ele.Attributes("dataClassInterface").First().Value;
+			DataClassName = ele.Attributes("dataClassName").First().Value;
+			GetMethodSuffix = ele.Attributes("getMethodSuffix").First().Value;
+			GetReturnsList = Convert.ToBoolean(ele.Attributes("getReturnsList").First().Value);
+			SaveMethodSuffix = ele.Attributes("saveMethodSuffix").First().Value;
+			foreach (var procEle in ele.Descendants("procs")?.Descendants("proc"))
+			{
+				var proc = new Proc(procEle);
+				Procs.Add(proc);
+			}
+		}
+
+		public string NamespacePrefix {get;set;} = "My"
+		public string TableName { get; set; }
+		public string EntityName { get; set; }
+		public string GetProc { get; set; }
+		public string SaveProc { get; set; }
+		public string ServiceClassName { get; set; }
+		public string UnitTestClassName { get; set; }
+		public string DataClassInterface { get; set; }
+		public string DataClassName { get; set; }
+		public string GetMethodSuffix { get; set; }
+		public bool GetReturnsList { get; set; }
+		public string SaveMethodSuffix { get; set; }
+		public List<ColumnData> ColumnDatas {get;set;} = new List<ColumnData>();
+		public List<Proc> Procs {get;set;} = new List<Proc>();
+	}
+
+	public class Proc
+	{
+		public Proc(){}
+		public Proc(XElement ele)
+		{
+			Name = ele.Attributes("name").First().Value;			
+			Type = ele.Attributes("procType").First().Value;			
+		}
+		
+
+		public string Name {get;set;}
+		public string Type {get;set;}
+	}
+
+	public class ColumnData
+	{
+		public string ColumnName {get;set;}
+		public string ConstName {get;set;}
+		public string PropertyName {get;set;}
+		public string DataType {get;set;}
+		public string SqlDbType {get;set;}
+		public bool IsNullable {get;set;}
+
+	}
+
+public Dictionary<string, List<ColumnData>> GetColumnData(string connStr, List<string> tableNames)
+{
+	var tableNameInList = string.Join(",",tableNames.Select(s => $"'{s}'"));
+	var columnQuery = $"SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME IN ({tableNameInList}) ORDER BY ORDINAL_POSITION";
+	var columns = new Dictionary<string, List<ColumnData>>();
+	using (SqlConnection conn = new SqlConnection(connStr))
+	{
+		conn.Open();
+		var cmd = new SqlCommand(columnQuery, conn);
+		var rdr = cmd.ExecuteReader();
+
+		while (rdr.Read())
+		{
+			var tableName = Convert.ToString(rdr["TABLE_NAME"]);
+			if (columns.ContainsKey(tableName) == false)
+			{
+				columns.Add(tableName, new List<ColumnData>());
+			}
+			var columnData = new ColumnData();
+			columnData.ColumnName = Convert.ToString(rdr["COLUMN_NAME"]);
+			columnData.PropertyName = MakeIdentifierSafeName(columnData.ColumnName);
+			columnData.ConstName = MakeDbIdentifierSafeName(columnData.ColumnName);
+			columnData.DataType = DeriveTypeName(Convert.ToString(rdr["DATA_TYPE"]));
+			columnData.SqlDbType = DeriveSqlTypeName(Convert.ToString(rdr["DATA_TYPE"]));
+			var isNullable = Convert.ToString(rdr["IS_NULLABLE"]);
+			if (isNullable.Equals("YES", StringComparison.OrdinalIgnoreCase))
+			{
+				columnData.IsNullable = true;
+			}
+			if (columnData.ColumnName.EndsWith("SeqID", StringComparison.OrdinalIgnoreCase) 
+				&& columnData.DataType == "Guid")
+			{
+				columnData.IsNullable = true;
+			}
+								
+			columns[tableName].Add(columnData);
+		} //end while
+
+		rdr.Close();
+	}
+	return columns;
+}
+
+
+	private string DeriveTypeName(string sqlDataType)
+	{
+		string returnValue;
+
+		switch (sqlDataType)
+		{
+			case "varchar":
+				returnValue = "string";
+				break;
+
+			case "nvarchar":
+				returnValue = "string";
+				break;
+			case "xml":
+				returnValue = "string";
+				break;
+		
+			case "int":
+				returnValue = "int";
+				break;
+			case "date":
+			case "datetime2":
+			case "datetime":
+				returnValue = "DateTime";
+				break;
+
+			case "bigint":
+				returnValue = "long";
+				break;
+
+			case "varbinary":
+				returnValue = "byte[]";
+				break;
+
+			case "bit":
+				returnValue = "bool";
+				break;
+			case "decimal":
+				returnValue = "decimal";
+				break;
+			case "uniqueidentifier":
+				returnValue = "Guid";
+				break;
+			case "numeric":
+				returnValue = "decimal";
+				break;
+			default:
+				returnValue = "string";
+				break;
+		}
+
+		return returnValue;
+	}
+
+	private string DeriveSqlTypeName(string sqlDataType)
+	{
+		string returnValue;
+
+		switch (sqlDataType)
+		{
+			case "varchar":
+				returnValue = "String";
+				break;
+
+			case "nvarchar":
+				returnValue = "String";
+				break;
+			case "xml":
+				returnValue = "String";
+				break;
+		
+			case "int":
+				returnValue = "Int32";
+				break;
+			case "date":
+			case "datetime2":
+			case "datetime":
+				returnValue = "DateTime";
+				break;
+
+			case "bigint":
+				returnValue = "Int64";
+				break;
+
+			case "varbinary":
+				returnValue = "Byte";
+				break;
+
+			case "bit":
+				returnValue = "Boolean";
+				break;
+			case "decimal":
+				returnValue = "Decimal";
+				break;
+			case "uniqueidentifier":
+				returnValue = "Guid";
+				break;
+			case "numeric":
+				returnValue = "Decimal";
+				break;
+			default:
+				returnValue = "String";
+				break;
+		}
+
+		return returnValue;
+	}
+
+	private string DeriveConvertToName(string netDataType)
+	{
+		string returnValue;
+
+		switch (netDataType)
+		{
+			case "string":
+				returnValue = "Convert.ToString(";
+				break;
+		
+			case "int":
+				returnValue = "Convert.ToInt32(";
+				break;
+
+			case "long":
+				returnValue = "Convert.ToInt64(";
+				break;
+			
+			case "DateTime":
+				returnValue = "Convert.ToDateTime(";
+				break;
+
+			case "byte[]":
+				returnValue = "(byte[])(";
+				break;
+
+			case "bool":
+				returnValue = "Convert.ToBoolean(";
+				break;
+
+			case "decimal":
+				returnValue = "Convert.ToDecimal(";
+				break;
+
+			case "Guid":
+				returnValue = "((Guid)";
+				break;
+
+			default:
+				returnValue = "Convert.ToString(";
+				break;
+		}
+
+		return returnValue;
+	}
+
+	private string MakeIdentifierSafeName(string str )
+	{
+
+		string _strippedUnderscore = str.Replace("_", "");
+
+		return Regex.Replace( 
+			Regex.Replace( 
+				_strippedUnderscore, 
+				@"(\P{Ll})(\P{Ll}\p{Ll})", 
+				"$1 $2" 
+			), 
+			@"(\p{Ll})(\P{Ll})", 
+			"$1 $2" 
+		).Replace("  ", "").Replace(" ", "");
+	}
+
+	private string MakeDbIdentifierSafeName(string str )
+	{
+
+		string _strippedUnderscore = str.Replace("_", " ");
+
+		return Regex.Replace( 
+			Regex.Replace( 
+				_strippedUnderscore, 
+				@"(\P{Ll})(\P{Ll}\p{Ll})", 
+				"$1 $2" 
+			), 
+			@"(\p{Ll})(\P{Ll})", 
+			"$1 $2" 
+		).ToUpper().Replace("  ", "_").Replace(" ", "_").Replace("__", "_");
+	}
+
+	private string LcaseFirstChar(string value)
+	{
+		if (String.IsNullOrWhiteSpace(value))
+		{
+			return String.Empty;
+		}
+
+		return value.Substring(0,1).ToLower() + value.Substring(1, value.Length -1);
+
+	}
+
+	private string UcaseFirstChar(string value)
+	{
+		if (String.IsNullOrWhiteSpace(value))
+		{
+			return String.Empty;
+		}
+
+		return value.Substring(0,1).ToUpper() + value.Substring(1, value.Length -1);
+
+	}
+
+	private string PatchKeyword(string value)
+	{
+		string output = value;
+		if(value == "operator")
+		{
+			output = value + "ID";
+		}
+		return output;
+	}
+
+	private string TypeForGet(string entityName, bool returnsList)
+	{
+		if (returnsList)
+		{
+			return "List<"+ entityName + ">";
+		}
+		return entityName;
+	}
+
+	private string SuffixForPlural(bool returnsList)
+	{
+		if (returnsList)
+		{
+			return "s";
+		}
+		return string.Empty;
+	}
+#>

@@ -1,0 +1,123 @@
+﻿<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="System.Xml.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ include file=".\StackBuilderTypesAndFunctions.ttinclude" #>
+
+<#+
+
+	
+public string BuildDataLayerInterfacesText(List<Stack> stacks, string changeLogStub, string dateTimeFormat)
+{
+	var sb = new StringBuilder();
+	sb.AppendLine($"// Generation happened at {DateTime.Now.ToString()} by {Environment.UserName}");
+	
+	foreach (var stack in stacks)
+	{
+		sb.AppendLine($"namespace {stack.NamespacePrefix}.Common.Interfaces");
+		sb.AppendLine($"{{");
+		sb.AppendLine($"\tusing System.Data;");
+		sb.AppendLine();
+		sb.AppendLine($"\t///<summary>Interface for I{stack.EntityName}Data</summary>");
+		sb.AppendLine($"\tpublic partial interface I{stack.EntityName}Data");
+		sb.AppendLine($"\t{{");		
+		sb.AppendLine($"\t\t///<summary>Gets data</summary>");
+		sb.AppendLine($"\t\tDataSet Get{stack.EntityName}s{stack.GetMethodSuffix}(object parameter);");
+		sb.AppendLine($"\t\t///<summary>Saves data</summary>");
+		sb.AppendLine($"\t\tbool Save{stack.EntityName}{stack.SaveMethodSuffix}(DataSet records, string userTicketId);");
+		sb.AppendLine($"\t}}");
+		sb.AppendLine("");
+		sb.AppendLine($"}}");
+	}
+	
+	return sb.ToString();
+}
+
+
+public string BuildDataLayerMethodsText(List<Stack> stacks, string changeLogStub, string dateTimeFormat)
+{
+	var sb = new StringBuilder();
+	
+	foreach (var stack in stacks)
+	{
+		sb.AppendLine($"namespace {stack.NamespacePrefix}.Data");
+		sb.AppendLine($"{{");
+		sb.AppendLine($"\tusing System;");
+		sb.AppendLine($"\tusing System.Data;");
+		sb.AppendLine($"\tusing Common.Interfaces;");
+		sb.AppendLine($"\tusing Microsoft.Practices.EnterpriseLibrary.Data;");
+		sb.AppendLine($"");
+		sb.AppendLine($"    ///<summary>Generated {stack.EntityName}Data</summary>");
+		sb.AppendLine($"	public partial class {stack.EntityName}Data : DatabaseCommandsBase, I{stack.EntityName}Data");
+		sb.AppendLine($"	{{");
+		sb.AppendLine();
+		sb.AppendLine($"        ///<summary> default ctor </summary>");	
+		sb.AppendLine($"		public {stack.EntityName}Data(string providerName, string connectionString) : base(providerName, connectionString) {{}}");	
+		sb.AppendLine();
+		sb.AppendLine($"		/// <inheritdoc />																														  ");
+		sb.AppendLine($"		/// <cl>																																  ");
+		sb.AppendLine($"		///		{DateTime.Now.ToString(dateTimeFormat)} {changeLogStub} - added																	");
+		sb.AppendLine($"		/// </cl>																																  ");
+		sb.AppendLine($"		public DataSet Get{stack.EntityName}s{stack.GetMethodSuffix}(object parametersList)																  ");
+		sb.AppendLine($"		{{																																		  ");
+		sb.AppendLine($"			var db = GetDatabase();																												  ");
+		sb.AppendLine($"			var cmd = db.GetStoredProcCommand(StoredProcs.{MakeDbIdentifierSafeName(stack.GetProc)});											  ");
+		sb.AppendLine($"																																				  ");
+		sb.AppendLine($"			db.AddInParameter(cmd, Fields.GENERIC_PARAM_FOR_NK, DbType.String, parametersList);																	  ");
+		sb.AppendLine($"																																				  ");
+		sb.AppendLine($"			DataSet returnValue;																												  ");
+		sb.AppendLine($"		    try																																	  ");
+		sb.AppendLine($"		    {{																																	  ");
+		sb.AppendLine($"		        returnValue = db.ExecuteDataSet(cmd);																							  ");
+		sb.AppendLine($"				ValidateDataset(returnValue, 1);																								  ");
+		sb.AppendLine($"				returnValue.Tables[0].TableName = Tables.{MakeDbIdentifierSafeName(stack.TableName)};											  ");
+		sb.AppendLine($"		    }}																																	  ");
+		sb.AppendLine($"		    catch (Exception ex)																												  ");
+		sb.AppendLine($"		    {{																																	  ");
+		sb.AppendLine($"		        throw new DataException(\"An attempt was made to get {stack.TableName}{stack.GetMethodSuffix}, but an error occured.\", ex);		  ");
+		sb.AppendLine($"		    }}																																	  ");
+		sb.AppendLine($"		    return returnValue;																													  ");
+		sb.AppendLine($"		}}																																		  ");
+		sb.AppendLine($"																																				  ");
+		sb.AppendLine($"		/// <inheritdoc />																														  ");
+		sb.AppendLine($"		/// <cl>																																  ");
+		sb.AppendLine($"		///		{DateTime.Now.ToString(dateTimeFormat)} {changeLogStub} - added														  ");
+		sb.AppendLine($"		/// </cl>																																  ");
+		sb.AppendLine($"		public bool Save{stack.EntityName}{stack.SaveMethodSuffix}(DataSet records, string userTicketID)										  ");
+		sb.AppendLine($"		{{																																		  ");
+		sb.AppendLine($"			var db = GetDatabase();																												  ");
+		sb.AppendLine($"			var cmd = db.GetStoredProcCommand(StoredProcs.{MakeDbIdentifierSafeName(stack.SaveProc)});											  ");
+		sb.AppendLine($"																																				  ");
+		foreach (var cd in stack.ColumnDatas)
+		{
+		sb.AppendLine($"			db.AddInParameter(cmd, Fields.{cd.ConstName}, DbType.{cd.SqlDbType}, Fields.{cd.ConstName}, DataRowVersion.Current);				 ");
+		}
+		sb.AppendLine($"			db.AddInParameter(cmd, Fields.USER_TICKET_ID, DbType.String, userTicketID);															  ");
+		sb.AppendLine($"																																				  ");
+		sb.AppendLine($"			try																																	  ");
+		sb.AppendLine($"		    {{																																	  ");
+		sb.AppendLine($"		        db.UpdateDataSet(records, Tables.{MakeDbIdentifierSafeName(stack.TableName)}, cmd, null, null, UpdateBehavior.Standard);			  ");
+		sb.AppendLine($"		    }}																																	  ");
+		sb.AppendLine($"		    catch (Exception ex)																												  ");
+		sb.AppendLine($"		    {{																																	  ");
+		sb.AppendLine($"		        throw new DataException(\"An attempt was made to save {stack.TableName}, but an error occured\", ex);							  ");
+		sb.AppendLine($"		    }}																																	  ");
+		sb.AppendLine($"																																				  ");
+		sb.AppendLine($"		    return true;																														  ");
+		sb.AppendLine($"		}}																																		  ");
+		sb.AppendLine($"	}}																																			 ");
+		sb.AppendLine($"}}"); 
+	}
+	
+	return sb.ToString();
+}
+
+#>

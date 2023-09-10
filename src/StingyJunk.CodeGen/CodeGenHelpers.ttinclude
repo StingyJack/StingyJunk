@@ -8,6 +8,10 @@
 <#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
 <#+
 
+	/// <summary>
+	/// 	This has helpers for short circut aborting the TT execution and avoiding overwriting output, 
+	/// as well as helpers for loading assemblies from more likely paths that the T4 host will use by default.
+	/// </summary>
     public class CodeGenHelpers
     {
         private static string _ConfigName;
@@ -55,7 +59,13 @@
             AppDomain.CurrentDomain.AssemblyResolve += LoadFromOutputFolder;
         }
 
-		//load from nuget packages first
+		/// <summary>
+		///		Tries to locate the assembly requested from either the current folder. If not found
+		/// there, a packages folder in the solution root will be attempted and searched. If not found
+		/// there, a .nuget folder in the solution root will be attempted and searched. 
+		///		This was for package.config style NuGets. This could be updated to use something like
+		/// `nuget locals global-packages -list` to get the search path instead.
+		/// </summary>
 		public Assembly LoadFromOutputFolder(object sender, ResolveEventArgs args)
 		{
 			var currentFolder = new FileInfo(_Host.ResolvePath(_Host.TemplateFile)).DirectoryName;

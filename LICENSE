@@ -1,28 +1,35 @@
 This software is available under two license models - "Qualifying" (the MIT with two extra bits)"
 or Non Qualifying (NonQual). 
 
-The difference between the two... 
+To qualify for the usual MIT license, you (and your organizaiton if applicable) need to have both 
+of the following clauses be not true. 
 
-If you are using this to further the profits or corporate, non-humanitarian, interests of Novo 
+If using this code to further the profits, success, or interestes of Novo 
 Nordisk (who doubled the cost of Novolin insulin that is required by some to maintain compatiblity 
-with life), then you are bound by the the NonQual. Likewise doing the same for Mylan, mostly due to 
+with life), then you are bound by the the NonQual.The same applies to Mylan, due to 
 the quintupling the cost of epi-pen.  These two deserve special mention due to the personal impact 
-they have on me. 
+they have. 
 
 If using this code (in source or object or derivative, etc) is contributing to or 
 enabling predatory capitalism (unreasonable profit/extortion, or increasing the cost of life-
-necessary products without other reasonable cause) like the aforementioned Novo and Mylan, you 
-are bound to the NonQual.
+necessary products without other reasonable cause) like the aforementioned Novo and Mylan, or by 
+causing harm to others without making meaningful and reasonable efforts (MnRE) to make amends (Samsung), your usage is 
+bound to the NonQual. To avoid getting mired in the subjectivity of what makes MnRE, the ultimate decision on 
+what is or is not MnRE will be made by myself or my immediate family. 
 
-All others get the usual MIT license, for as long as they do not fall into the NonQual provisions.
+If neither of these are true for your intended usage, the Qualifying license applies (and thank you for 
+being non-evil human being). 
+
+If either of these are true for your intended usage, the Non Qualifying license applies (and fuck you for being
+an evil bastard).
 
 
-This part of the license is subject to change.
+This part of the license is subject to change, but if you are good, you will have nothing to worry about.
 
 ----------------
 Qualifying - (Copied from MIT)
 
-Copyright (c) 2017 Andrew Stanton
+Copyright (c) 2017, 2024 Andrew Stanton
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -62,9 +69,10 @@ Non-Qualifying
 
 You should probably just fuck off at this point because you cannot really use, copy, modify, or even 
 look at this code. If you fall into the requirements for this license, and are using any of the
-software covered by it, an exception will be made if you provide non-conditioned financial
-aid (and volunteer labor) to any non-affiliated third parties involved with any of the following efforts...
- - Ensures that every homeless person in the US will have a safe place to live and receive the medical care they need
+software covered by it, an exception will be made if you provide non-conditioned substantial financial
+aid (and volunteer labor) of no less than 20% of the organizations and C-level executive salaries to any 
+non-affiliated third parties involved with any of the following efforts...
+ - Ensures that every homeless person and animal in the US will have a safe place to live and receive the medical care they need
  - Ensures that every US citizen, and those who's intention or desire is to become a citizen, has access to the same quality
  of food that you would feed your own family.
  - Closes down every animal kill shelter and opens enough no-kill shelters (with any necessary medical care, spay/neuter, etc)

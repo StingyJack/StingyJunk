@@ -14,7 +14,7 @@
 <#	
 
 	var m_connStrs = new List<string>();
-	m_connStrs.Add("Your connection string here");
+	m_connStrs.Add("Server=.;Database=DB;TrustServerCertificate=True;Authentication=Active Directory Integrated");
 	
 	string m_columnQuery = @"SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS ORDER BY TABLE_NAME, ORDINAL_POSITION";
 	string m_tableQuery = @"SELECT DISTINCT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES ORDER BY TABLE_NAME";
@@ -282,7 +282,7 @@ namespace ChangeMeNamespace
 			), 
 			@"(\p{Ll})(\P{Ll})", 
 			"$1 $2" 
-		).ToUpper().Replace("  ", "_").Replace(" ", "_").Replace("__", "_");
+		).ToUpper().Replace("  ", "_").Replace(" ", "_").Replace("__", "_").Replace("-", "_").Replace("/", "_").Replace("#", "_");
 	}
 
 

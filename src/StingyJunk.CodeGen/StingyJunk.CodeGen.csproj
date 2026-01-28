@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StingyJunk.CodeGen</RootNamespace>
     <AssemblyName>StingyJunk.CodeGen</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,16 +38,42 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="ApplyUpdate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ApplyUpdate.tt</DependentUpon>
+    </Compile>
     <Compile Include="AsmResolvableTtHost.cs" />
+    <Compile Include="DataDependent.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataDependent.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SchemaDependent.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SchemaDependent.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TableSourcedEntities.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TableSourcedEntities.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="CodeGen.config" />
     <None Include="CodeGenHelpers.ttinclude" />
     <None Include="GenerationHelpers.ttinclude" />
     <None Include="StackBuilder.DataLayer.ttinclude" />
     <None Include="StackBuilderTypesAndFunctions.ttinclude" />
+    <None Include="stored proc generation.csx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ApplyUpdate.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ApplyUpdate.cs</LastGenOutput>
+    </Content>
     <Content Include="DataDependent.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>DataDependent.cs</LastGenOutput>
@@ -54,6 +81,10 @@
     <Content Include="SchemaDependent.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>SchemaDependent.cs</LastGenOutput>
+    </Content>
+    <Content Include="TableSourcedEntities.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>TableSourcedEntities.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

@@ -100,7 +100,6 @@ namespace <#= _td.TableGenData.NamespaceName #>
     /// This class is based off the schema of <#= _td.TableGenData.TableName #>
     /// </summary>
 	<#=  _td.TableGenData.Serializable ? "[Serializable]" : "" #>
-	[DataContract]
 	public partial class <#= _td.TableGenData.ClassName #>
 	{
 

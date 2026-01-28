@@ -1,0 +1,284 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="System.Xml.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ include file=".\GenerationHelpers.ttinclude" #>
+<#	
+	string _ConfigFilePath = Host.ResolvePath("CodeGen.config");
+	XDocument _Cfg = XDocument.Load(_ConfigFilePath);
+	XElement _DbConnEle = _Cfg.Descendants("databaseConnectionString").First();
+	string _ConnStr = _DbConnEle.Value;
+	XElement _TablesEle = _Cfg.Descendants("tables").First();
+	string _ColumnQuery = @"SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{0}' ORDER BY ORDINAL_POSITION	";
+
+	List<TableGen> _Tables = new List<TableGen>();
+	List<TableData> _ClassDefs = new List<TableData>();
+	
+	foreach (XElement _tableEle in _TablesEle.Descendants())
+	{
+		
+		string _tableName = _tableEle.Attribute("tableName").Value;
+		string _namespaceName = _tableEle.Attribute("namespaceName").Value;
+		string _className = _tableEle.Attribute("className").Value;
+		bool _sdc = false;
+		XAttribute _suppressDefaultCtor = _tableEle.Attribute("suppressDefaultConstructor");
+		if (_suppressDefaultCtor != null)
+		{
+			_sdc = Convert.ToBoolean(_suppressDefaultCtor.Value);
+		}
+
+		XAttribute _serAttr = _tableEle.Attribute("serializable");
+		bool _serializable = false;
+		if(_serAttr != null)
+		{_serializable = Boolean.Parse(_tableEle.Attribute("serializable").Value);}
+
+		_Tables.Add(new TableGen(_tableName, _namespaceName, _className,_serializable, _sdc));
+	}
+
+
+	using (SqlConnection _conn = new SqlConnection(_ConnStr))
+	{
+		_conn.Open();
+
+		foreach (TableGen _tgen in _Tables)
+		{
+			TableData _td = new TableData(_tgen);
+
+			SqlCommand _cmd = new SqlCommand(String.Format(_ColumnQuery, _tgen.TableName), _conn);
+			SqlDataReader _rdr = _cmd.ExecuteReader();
+
+			while (_rdr.Read())
+			{
+				ColumnData _cd = new ColumnData();
+				_cd.ColumnName = Convert.ToString(_rdr["COLUMN_NAME"]);
+				_cd.PropertyName = MakeIdentifierSafeName(_cd.ColumnName);
+				_cd.DataType = DeriveTypeName(Convert.ToString(_rdr["DATA_TYPE"]));
+				string _isNullable = Convert.ToString(_rdr["IS_NULLABLE"]);
+				if (_isNullable.Equals("YES", StringComparison.OrdinalIgnoreCase)
+					|| (_cd.ColumnName == "SeqID" && _cd.DataType == "Guid"))
+				{
+					_cd.IsNullable = true;
+				}
+								
+				_td.Columns.Add(_cd);
+			} //end while
+
+			_rdr.Close();
+			_ClassDefs.Add(_td);
+		} 
+
+	} //end using 
+
+#>
+/////////////////////////////////////////////////
+// Code generated file - DO NOT DIRECTLY EDIT
+// <#= DateTime.Now.ToShortDateString() #> <#= Environment.UserName.ToUpper() #> - Regenerated content
+// Code generated file - DO NOT DIRECTLY EDIT
+/////////////////////////////////////////////////
+
+using System;
+using System.Data;
+using System.Runtime.Serialization;
+
+<#
+
+	foreach (TableData _td in _ClassDefs)
+	{
+#>
+namespace <#= _td.TableGenData.NamespaceName #>
+{
+	/// <summary>
+    /// This class is based off the schema of <#= _td.TableGenData.TableName #>
+    /// </summary>
+	<#=  _td.TableGenData.Serializable ? "[Serializable]" : "" #>
+	[DataContract]
+	public partial class <#= _td.TableGenData.ClassName #>
+	{
+
+	#region "Properties"
+
+<#
+		foreach (ColumnData _cd in _td.Columns)
+		{
+			string nullableChar = ((_cd.DataType != "string" && _cd.DataType != "byte[]") && _cd.IsNullable == true) ? "?":"";
+#>
+		/// <summary>
+		/// Holds a value linked to the <#= _td.TableGenData.TableName #>.<#= _cd.ColumnName #> column
+		/// </summary>
+		[DataMember]
+		public <#= _cd.DataType #><#= nullableChar #> <#= _cd.PropertyName #> {get;set;}
+<#
+		}
+#>	
+	#endregion //"Properties"
+
+	#region "Constructors"
+<#
+	if (_td.TableGenData.SuppressDefaultCtor == false)
+	{
+#>
+	/// <summary>
+    /// Creates a new empty instance
+    /// </summary>
+	public <#= _td.TableGenData.ClassName #>()
+	{}
+
+<#
+	}
+#>
+	/// <summary>
+    /// Creates a new instance from the values provided
+    /// </summary>
+	<#
+	foreach (ColumnData _cd in _td.Columns)
+	{
+	#>/// <param name="<#= patchKeyword(LcaseFirstChar(_cd.PropertyName)) #>">The <#= patchKeyword(LcaseFirstChar(_cd.PropertyName)) #></param>
+	<#
+	}#>
+public <#= _td.TableGenData.ClassName #>(<#= GenerateParamList(_td.Columns) #>)
+	{
+<#
+		foreach (ColumnData _cd in _td.Columns)
+		{
+#>
+		this.<#= _cd.PropertyName #> = <#= patchKeyword(LcaseFirstChar(_cd.PropertyName)) #>;
+<#
+		}
+#>
+	}
+
+	/// <summary>
+    /// Creates a new instance from a row based off the schema of <#= _td.TableGenData.TableName #>
+    /// </summary>
+	/// <param name="row">The row to hydrate the instance from</param>
+	/// <param name="treatAllAsNullable">True if values should be treated as nullable for casting</param>
+	public <#= _td.TableGenData.ClassName #>(DataRow row, bool treatAllAsNullable = false)
+	{
+<#
+		foreach (ColumnData _cd in _td.Columns)
+		{
+			var convertToStatement = DeriveConvertToName(_cd.DataType);
+			string convertSuffix = string.Empty;
+			if (convertToStatement.EndsWith("string(", StringComparison.OrdinalIgnoreCase))
+			{
+				convertSuffix = ".Trim()";
+			}
+
+			if (_cd.IsNullable == false)
+			{
+#>
+		if (treatAllAsNullable && row.Table.Columns.Contains("<#= _cd.ColumnName #>") && (row[@"<#= _cd.ColumnName #>"].Equals(DBNull.Value) == false)) 
+		{
+			<#= _cd.PropertyName #> = <#= convertToStatement #>row[@"<#= _cd.ColumnName #>"])<#= convertSuffix #>;
+		}
+<#
+				if (_cd.DataType == "bool")
+				{
+#>
+		else if (row.Table.Columns.Contains("<#= _cd.ColumnName #>") && (row[@"<#= _cd.ColumnName #>"].Equals(DBNull.Value) == false))
+		{
+			<#= _cd.PropertyName #> = <#= convertToStatement #>row[@"<#= _cd.ColumnName #>"]);
+		}
+
+<#				
+				}
+				else
+				{
+#>
+		else if (row.Table.Columns.Contains("<#= _cd.ColumnName #>"))
+		{
+			<#= _cd.PropertyName #> = <#= convertToStatement #>row[@"<#= _cd.ColumnName #>"])<#= convertSuffix #>;
+		}
+
+<#
+				}
+
+			}
+			else {
+#>
+		if (row.Table.Columns.Contains("<#= _cd.ColumnName #>") && row[@"<#= _cd.ColumnName #>"].Equals(DBNull.Value) == false)
+		{
+			<#= _cd.PropertyName #> = <#= convertToStatement #>row[@"<#= _cd.ColumnName #>"])<#= convertSuffix #>;
+		}
+
+<#
+			}
+#>
+<#
+		}
+#>
+	}
+
+	#endregion //"Constructors"
+	
+	#region "public methods"
+
+	/// <summary>
+	///		Applies the current instance values to a datarow utilizing the <#= _td.TableGenData.TableName #> table schema
+	/// </summary>
+	/// <param name="row">The row to apply the instance data to</param>
+	public void ApplyToRow(DataRow row)
+	{
+	<#
+		foreach (ColumnData _cd in _td.Columns)
+		{
+			bool isNullableType = (_cd.DataType == "string" || _cd.IsNullable == true);
+			
+			if (isNullableType)
+			{
+		#>
+		if (<#= _cd.PropertyName #> == null)
+		{
+			row["<#= _cd.ColumnName  #>"] = DBNull.Value;
+		}
+		else
+		{
+			row["<#= _cd.ColumnName  #>"] = <#= _cd.PropertyName #>;
+		}
+<#
+			}
+			else
+		{#>	
+		row["<#= _cd.ColumnName  #>"] = <#= _cd.PropertyName #>;
+<#				}
+		}
+  #>		}
+	}
+
+	#endregion //#region "public methods"
+
+} 
+
+<#
+	}
+#>
+
+	#region "helper methods"
+namespace My.Codegen.Common {
+	///<summary>Some minor utilities</summary>
+	public static class CodeGenUtils
+	{
+
+		///<summary>Converts a dataRowcolumn to a timespan</summary>
+		internal static TimeSpan? ConvertToTimeSpan(object dataRowColumn)
+		{
+			if (dataRowColumn == null)
+			{
+				return null;
+			}
+
+			return TimeSpan.Parse(dataRowColumn.ToString());	
+		}
+	}
+}
+	#endregion //#region "helper methods"
+

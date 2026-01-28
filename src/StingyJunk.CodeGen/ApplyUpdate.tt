@@ -1,0 +1,507 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="System.Xml.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#	
+	string m_configFilePath = @".\CodeGen.config";
+	XDocument m_cfg = XDocument.Load(m_configFilePath);
+	XElement m_dbConnEleVT = m_cfg.Descendants("databaseConnectionString").First();
+	string m_connStr = m_dbConnEleVT.Value;
+	XElement m_tablesEle = m_cfg.Descendants("tables").First();
+	string m_columnQuery = @"SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{0}' AND COLUMN_NAME NOT LIKE '%RMGT%' ORDER BY ORDINAL_POSITION	";
+
+	List<TableGen> m_tables = new List<TableGen>();
+	List<TableData> m_classes = new List<TableData>();
+	
+	foreach (XElement _tableEle in m_tablesEle.Descendants())
+	{
+		
+		string _tableName = _tableEle.Attribute("tableName").Value;
+		string _namespaceName = _tableEle.Attribute("namespaceName").Value;
+		string _className = _tableEle.Attribute("className").Value;
+		bool _sdc = false;
+		XAttribute _suppressDefaultCtor = _tableEle.Attribute("suppressDefaultConstructor");
+		if (_suppressDefaultCtor != null)
+		{
+			_sdc = Convert.ToBoolean(_suppressDefaultCtor.Value);
+		}
+
+		XAttribute _serAttr = _tableEle.Attribute("serializable");
+		bool _serializable = false;
+		if(_serAttr != null)
+		{_serializable = Boolean.Parse(_tableEle.Attribute("serializable").Value);}
+
+		m_tables.Add(new TableGen(_tableName, _namespaceName, _className,_serializable, _sdc));
+	}
+
+
+	using (SqlConnection _conn = new SqlConnection(m_connStr))
+	{
+		_conn.Open();
+
+		foreach (TableGen _tgen in m_tables)
+		{
+			TableData _td = new TableData(_tgen);
+
+			SqlCommand _cmd = new SqlCommand(String.Format(m_columnQuery, _tgen.TableName), _conn);
+			SqlDataReader _rdr = _cmd.ExecuteReader();
+
+			while (_rdr.Read())
+			{
+				ColumnData _cd = new ColumnData();
+				_cd.ColumnName = Convert.ToString(_rdr["COLUMN_NAME"]);
+				_cd.PropertyName = MakeIdentifierSafeName(_cd.ColumnName);
+				_cd.DataType = DeriveTypeName(Convert.ToString(_rdr["DATA_TYPE"]));
+				string _isNullable = Convert.ToString(_rdr["IS_NULLABLE"]);
+				if (_isNullable.Equals("YES", StringComparison.OrdinalIgnoreCase))
+				{
+					_cd.IsNullable = true;
+				}
+				if (_cd.ColumnName.EndsWith("SeqID", StringComparison.OrdinalIgnoreCase) 
+					&& _cd.DataType == "Guid")
+				{
+					_cd.IsNullable = true;
+				}
+								
+				_td.Columns.Add(_cd);
+			} //end while
+
+			_rdr.Close();
+			m_classes.Add(_td);
+		} 
+
+	} //end using 
+
+#>
+/////////////////////////////////////////////////
+// Code generated file - DO NOT DIRECTLY EDIT
+// <#= DateTime.Now.ToShortDateString() #> <#= Environment.UserName.ToUpper() #> - Regenerated content
+// Code generated file - DO NOT DIRECTLY EDIT
+/////////////////////////////////////////////////
+
+using System;
+using System.Text;
+using System.Data;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+using System.Diagnostics.CodeAnalysis;
+
+<#
+
+	foreach (TableData _td in m_classes)
+	{
+#>
+namespace <#= _td.TableGenData.NamespaceName #>
+{
+	/// <summary>
+    /// This class is based off the schema of <#= _td.TableGenData.TableName #>
+    /// </summary>
+	<#=  _td.TableGenData.Serializable ? "[Serializable]" : "" #>
+	[DataContract]
+	public partial class <#= _td.TableGenData.ClassName #>
+	{
+
+	#region "Properties"
+
+<#
+		foreach (ColumnData _cd in _td.Columns)
+		{
+			string nullableChar = ((_cd.DataType != "string" && _cd.DataType != "byte[]") && _cd.IsNullable == true) ? "?":"";
+#>
+		/// <summary>
+		/// Holds a value linked to the <#= _td.TableGenData.TableName #>.<#= _cd.ColumnName #> column
+		/// </summary>
+		[DataMember]
+		public <#= _cd.DataType #><#= nullableChar #> <#= _cd.PropertyName #> {get;set;}
+<#
+		}
+#>	
+	#endregion //"Properties"
+
+	#region "Constructors"
+<#
+	if (_td.TableGenData.SuppressDefaultCtor == false)
+	{
+#>
+	/// <summary>
+    /// Creates a new empty instance
+    /// </summary>
+	[ExcludeFromCodeCoverage]
+	public <#= _td.TableGenData.ClassName #>()
+	{}
+
+<#
+	}
+#>
+	/// <summary>
+    /// Creates a new instance from the values provided
+    /// </summary>
+	<#
+	foreach (ColumnData _cd in _td.Columns)
+	{
+	#>/// <param name="<#= patchKeyword(LcaseFirstChar(_cd.PropertyName)) #>">The <#= patchKeyword(LcaseFirstChar(_cd.PropertyName)) #></param>
+	<#
+	}#>
+[ExcludeFromCodeCoverage]
+	public <#= _td.TableGenData.ClassName #>(<#= GenerateParamList(_td.Columns) #>)
+	{
+<#
+		foreach (ColumnData _cd in _td.Columns)
+		{
+#>
+		<#= _cd.PropertyName #> = <#= LcaseFirstChar(_cd.PropertyName) #>;
+<#
+		}
+#>
+	}
+
+	/// <summary>
+    /// Creates a new instance from a row based off the schema of <#= _td.TableGenData.TableName #>
+    /// </summary>
+	/// <param name="row">The row based off the schema of <#= _td.TableGenData.TableName #></param>
+	/// <param name="treatAllAsNullable">Treat all columns as nullable or not</param>
+	[ExcludeFromCodeCoverage]
+	public <#= _td.TableGenData.ClassName #>(DataRow row, bool treatAllAsNullable = false)
+	{
+<#
+		foreach (ColumnData _cd in _td.Columns)
+		{
+			if (_cd.IsNullable == false)
+			{
+#>
+		if (treatAllAsNullable && row.Table.Columns.Contains("<#= _cd.ColumnName #>") && (row[@"<#= _cd.ColumnName #>"].Equals(DBNull.Value) == false)) 
+		{
+			this.<#= _cd.PropertyName #> = <#= DeriveConvertToName(_cd.DataType) #>row[@"<#= _cd.ColumnName #>"]);
+		}
+		else if (row.Table.Columns.Contains("<#= _cd.ColumnName #>"))
+		{
+			this.<#= _cd.PropertyName #> = <#= DeriveConvertToName(_cd.DataType) #>row[@"<#= _cd.ColumnName #>"]);
+		}
+
+<#
+			}
+			else {
+#>
+		if (row.Table.Columns.Contains("<#= _cd.ColumnName #>") && row[@"<#= _cd.ColumnName #>"].Equals(DBNull.Value) == false)
+		{
+			this.<#= _cd.PropertyName #> = <#= DeriveConvertToName(_cd.DataType) #>row[@"<#= _cd.ColumnName #>"]);
+		}
+
+<#
+			}
+#>
+<#
+		}
+#>
+	}
+
+		#endregion //"Constructors"
+
+	#region "methods"
+
+	/// <summary>
+	///		Applies the current instance values to a datarow utilizing the <#= _td.TableGenData.TableName #> table schema
+	/// </summary>
+	/// <param name="updates">Dictionary of requested updates. Key is column name value is update value.</param>
+	[ExcludeFromCodeCoverage]
+	public void ApplyUpdate(Dictionary<string, object> updates)
+	{
+		foreach (var update in updates)
+		{
+	<#
+			foreach (ColumnData _cd in _td.Columns)
+			{
+		#>
+		if (update.Key.Equals("<#= _cd.ColumnName #>", StringComparison.OrdinalIgnoreCase))
+			{
+				<#= _cd.PropertyName #> = <#= DeriveConvertToName(_cd.DataType) #>update.Value);
+			}
+	<#
+			}
+		#>
+	}
+    }
+
+	/// <summary>
+	///		Applies the current instance values to a datarow utilizing the <#= _td.TableGenData.TableName #> table schema
+	/// </summary>
+	/// <param name="row">The row based off the schema of <#= _td.TableGenData.TableName #></param>
+	[ExcludeFromCodeCoverage]
+	public void ApplyToRow(DataRow row)
+	{
+	<#
+		foreach (ColumnData _cd in _td.Columns)
+		{
+			bool isNullableType = (_cd.DataType == "string" || _cd.IsNullable == true);
+			
+			if (isNullableType)
+			{
+		#>
+		if (<#= _cd.PropertyName #> == null)
+		{
+			row["<#= _cd.ColumnName  #>"] = DBNull.Value;
+		}
+		else
+		{
+			row["<#= _cd.ColumnName  #>"] = <#= _cd.PropertyName #>;
+		}
+<#
+			}
+			else
+		{#>	
+		row["<#= _cd.ColumnName  #>"] = <#= _cd.PropertyName #>;
+<#				}
+		}
+  #>	}
+
+	/// <summary>
+	///		Makes a per-property copy of the current instance
+	/// </summary>
+	/// <returns>Copy of <#= _td.TableGenData.ClassName #> instance</returns>
+	[ExcludeFromCodeCoverage]
+	public <#= _td.TableGenData.ClassName #> Copy()
+	{
+		var copyObj = new <#= _td.TableGenData.ClassName #>();
+<#
+		foreach (ColumnData _cd in _td.Columns)
+		{			
+		#>
+		copyObj.<#= _cd.PropertyName #> = <#= _cd.PropertyName #>;
+<#		}
+		
+  #>		return copyObj;
+	}
+
+	/// <summary>
+	///		Converts the instance into string values
+	/// </summary>
+	/// <returns>The stringified instance</returns>
+	[ExcludeFromCodeCoverage]
+	public override string ToString()
+	{
+		var sb = new StringBuilder("<#= _td.TableGenData.ClassName #> {");
+<#		
+		foreach (ColumnData _cd in _td.Columns)
+		{
+#>
+		sb.AppendFormat("\"{0}\":\"{1}\", ", "<#= _cd.PropertyName #>",<#= _cd.PropertyName #>);
+<#
+		}
+	#>
+		sb.Length = sb.Length -2; //backs up to overwrite the comma
+		sb.Append("}");
+		return sb.ToString().TrimEnd(',');
+	}
+
+	#endregion //#region "methods"
+
+	}
+} 
+
+<#
+	}
+#>
+
+<#+
+	private class TableGen
+	{
+
+		public string TableName {get;set;}
+		public string NamespaceName {get;set;}
+		public string ClassName {get;set;}
+		public bool Serializable {get;set;}
+		public bool SuppressDefaultCtor {get;set;}
+		public TableGen(string tableName, string namespaceName, string className,bool serializable, bool suppressDefaultCtor)
+		{
+			this.TableName = tableName;
+			this.NamespaceName= namespaceName;
+			this.ClassName = className;
+			this.Serializable = serializable;
+			this.SuppressDefaultCtor = suppressDefaultCtor;
+		}
+
+	}
+
+	private class TableData
+	{
+
+		public TableGen TableGenData {get;set;}
+		public List<ColumnData> Columns;
+
+		public TableData(TableGen tableData)
+		{
+			this.TableGenData = tableData;
+			this.Columns = new List<ColumnData>(8);
+		}
+
+	}
+
+	private class ColumnData
+	{
+
+		public string ColumnName {get;set;}
+		public string PropertyName {get;set;}
+		public string DataType {get;set;}
+		public bool IsNullable {get;set;}
+
+	}
+
+	private string DeriveTypeName(string sqlDataType)
+	{
+		string returnValue;
+
+		switch (sqlDataType)
+		{
+			case "varchar":
+				returnValue = "string";
+				break;
+
+			case "nvarchar":
+				returnValue = "string";
+				break;
+			case "xml":
+				returnValue = "string";
+				break;
+		
+			case "int":
+				returnValue = "int";
+				break;
+			case "date":
+			case "datetime2":
+			case "datetime":
+				returnValue = "DateTime";
+				break;
+
+			case "bigint":
+				returnValue = "long";
+				break;
+
+			case "varbinary":
+				returnValue = "byte[]";
+				break;
+
+			case "bit":
+				returnValue = "bool";
+				break;
+			case "decimal":
+				returnValue = "decimal";
+				break;
+			case "uniqueidentifier":
+				returnValue = "Guid";
+				break;
+			default:
+				returnValue = "string";
+				break;
+		}
+
+		return returnValue;
+	}
+
+	private string DeriveConvertToName(string netDataType)
+	{
+		string returnValue;
+
+		switch (netDataType)
+		{
+			case "string":
+				returnValue = "Convert.ToString(";
+				break;
+		
+			case "int":
+				returnValue = "Convert.ToInt32(";
+				break;
+
+			case "long":
+				returnValue = "Convert.ToInt64(";
+				break;
+			
+			case "DateTime":
+				returnValue = "Convert.ToDateTime(";
+				break;
+
+			case "byte[]":
+				returnValue = "(byte[])(";
+				break;
+
+			case "bool":
+				returnValue = "Convert.ToBoolean(";
+				break;
+
+			case "decimal":
+				returnValue = "Convert.ToDecimal(";
+				break;
+
+			case "Guid":
+				returnValue = "((Guid)";
+				break;
+
+			default:
+				returnValue = "Convert.ToString(";
+				break;
+		}
+
+		return returnValue;
+	}
+
+	private string MakeIdentifierSafeName(string str )
+	{
+
+		string _strippedUnderscore = str.Replace("_", "");
+
+		return Regex.Replace( 
+			Regex.Replace( 
+				_strippedUnderscore, 
+				@"(\P{Ll})(\P{Ll}\p{Ll})", 
+				"$1 $2" 
+			), 
+			@"(\p{Ll})(\P{Ll})", 
+			"$1 $2" 
+		).Replace("  ", "").Replace(" ", "");
+	}
+
+	private string LcaseFirstChar(string value)
+	{
+		if (String.IsNullOrWhiteSpace(value))
+		{
+			return String.Empty;
+		}
+
+		return value.Substring(0,1).ToLower() + value.Substring(1, value.Length -1);
+
+	}
+
+	private string patchKeyword(string value)
+	{
+		string output = value;
+		if(value == "operator")
+		{
+			output = value + "ID";
+		}
+		return output;
+	}
+
+	private string GenerateParamList(List<ColumnData> columns)
+	{
+
+		StringBuilder _paramList = new StringBuilder();
+
+		foreach (ColumnData _cd in columns)
+		{
+			_paramList.AppendFormat("{0} {1}, ", _cd.DataType, LcaseFirstChar(_cd.PropertyName));
+		}
+
+		string _returnValue = _paramList.ToString().Trim();
+		
+		return _returnValue.Remove(_returnValue.Length - 1, 1);
+	}
+
+#>
